@@ -25,6 +25,11 @@ def index():
         schema:
           type: string
         description: The query sting to search with
+      - in: query
+        name: page
+        schema:
+          type: number
+        description: The results page number
     responses:
       200:
         description:
@@ -38,7 +43,9 @@ def index():
         discovery_api.add_query(request.args.get("q"))
     else:
         discovery_api.add_query("*")
-    results = discovery_api.get_results()
+    results = discovery_api.get_results(
+        request.args.get("page") if "page" in request.args else 1
+    )
     return results
 
 

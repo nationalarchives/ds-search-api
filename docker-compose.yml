@@ -6,6 +6,7 @@ services:
     environment:
       - ENVIRONMENT=develop
       - SECRET_KEY=abc123
+      - DISCOVERY_API_URL=https://discovery.nationalarchives.gov.uk/API/search/v1
       - WAGTAIL_API_URL=http://host.docker.internal:8000/api/v2
     ports:
       - 65534:8080
