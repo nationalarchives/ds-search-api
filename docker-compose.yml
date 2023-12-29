@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    environment:
+      - ENVIRONMENT=develop
+      - SECRET_KEY=abc123
+      - WAGTAIL_API_URL=http://host.docker.internal:8000/api/v2
+    ports:
+      - 65534:8080
+    volumes:
+      - ./:/app
+
+  dev:
+    image: ghcr.io/nationalarchives/tna-python-dev:preview
+    volumes:
+      - ./:/app
