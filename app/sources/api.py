@@ -12,9 +12,8 @@ class BaseAPI(ABC):
 
 
 class GetAPI(BaseAPI):
-    def __init__(self):
-        self.filters = {}
-        pass
+    results_per_page: int = 20
+    filters: dict = {}
 
     def add_parameter(self, key: str, value: str | int) -> None:
         self.filters[key] = value
