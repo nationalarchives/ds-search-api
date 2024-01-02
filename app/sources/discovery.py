@@ -1,10 +1,5 @@
-import json
-
-import requests
-from app.records.schemas.record import Record
-from app.records.schemas.records_response import RecordsResponse
+from app.records.schemas import Record, RecordsResponse
 from config import Config
-from flask import current_app
 
 from .api import GetAPI
 
@@ -15,27 +10,24 @@ class DiscoveryRecords(GetAPI):
         self.filters = {"sps.sortByOption": "RELEVANCE"}
         pass
 
-    def add_query(self, query_string):
+    def add_query(self, query_string: str) -> None:
         self.add_parameter("sps.searchQuery", query_string)
 
-    def build_query_string(self):
-        print(self.filters)
+    def build_query_string(self) -> str:
         return "&".join(
             ["=".join((key, str(value))) for key, value in self.filters.items()]
         )
 
-    def get_results(self, page=1):
+    def get_results(self, page: int | None = 1) -> dict:
         self.add_parameter("sps.page", page)
         url = f"{self.api_url}/records?{self.build_query_string()}"
         raw_results = self.execute(url)
-        results = []
+        response = RecordsResponse()
         for r in raw_results["records"]:
             record = Record()
-            record.set_id(r["id"])
-            record.set_ref(r["reference"])
-            record.set_title(r["title"])
-            results.append(record.toJSON())
-        response = RecordsResponse()
-        response.set_count(raw_results["count"])
-        response.set_results(results)
+            record.id = r["id"]
+            record.ref = r["reference"]
+            record.title = r["title"]
+            response.results.append(record)
+        response.count = raw_results["count"]
         return response.toJSON()

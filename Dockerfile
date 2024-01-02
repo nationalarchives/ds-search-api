@@ -1,4 +1,5 @@
-FROM ghcr.io/nationalarchives/tna-python:latest
+# FROM ghcr.io/nationalarchives/tna-python:latest
+FROM tna-python-async
 
 # Copy in the application code
 COPY --chown=app . .
@@ -7,4 +8,4 @@ COPY --chown=app . .
 RUN tna-build
 
 # Run the application
-CMD ["tna-run", "etna-search-api:app"]
+CMD ["tna-run", "-a", "etna-search-api:app"]

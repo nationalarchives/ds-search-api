@@ -1,13 +1,15 @@
-class APIResponse:
-    def __init__(self):
-        self.count = 0
-        self.results = ""
+from pydantic import BaseModel, ConfigDict
 
-    def set_count(self, count):
-        self.count = count
+from .api_result import APIResult
 
-    def set_results(self, results):
-        self.results = results
+
+class APIResponse(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    count: int = 0
+    results: list[APIResult] = []
 
     def toJSON(self):
-        return self.__dict__
+        return self.__dict__ | {
+            "results": [result.toJSON() for result in self.results]
+        }
