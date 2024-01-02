@@ -1,5 +1,4 @@
-# FROM ghcr.io/nationalarchives/tna-python:latest
-FROM tna-python-async
+FROM ghcr.io/nationalarchives/tna-python:latest
 
 # Copy in the application code
 COPY --chown=app . .
