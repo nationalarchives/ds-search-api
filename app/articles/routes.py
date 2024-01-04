@@ -6,10 +6,28 @@ from .schemas import ArticleFilter, ArticleSearchResults
 
 @router.get("/")
 async def index(
-    q: str | None = "", page: int | None = 1
+    q: str | None = None, type: str | None = None, page: int | None = 1
 ) -> ArticleSearchResults:
     website_api = WebsiteArticles()
-    website_api.add_query(q or "")
+    website_api.params = {}  # TODO: Why are params persisting?
+    if q:
+        website_api.add_query(q)
+    if type:
+        website_api.add_parameter("type", type)
+    else:
+        website_api.add_parameter(
+            "type",
+            ",".join(
+                [
+                    "articles.ArticlePage",
+                    "articles.FocusedArticlePage",
+                    "articles.RecordArticlePage",
+                    "collections.HighlightGalleryPage",
+                    "collections.TimePeriodExplorerPage",
+                    "collections.TopicExplorerPage",
+                ]
+            ),
+        )
     results = website_api.get_results(page)
     return results
 
@@ -25,10 +43,26 @@ async def filters() -> list[ArticleFilter]:
         )
     filters.append(time_period_filter)
 
-    topics_filter = ArticleFilter("Topics")
+    topics_filter = ArticleFilter("Topic")
     topics = get_topics()
-    for topic in sorted(topics, key=lambda x: x['name']):
+    for topic in sorted(topics, key=lambda x: x["name"]):
         topics_filter.add_filter_option(topic["name"], topic["value"])
     filters.append(topics_filter)
+
+    types_filter = ArticleFilter("Type")
+    types_filter.add_filter_option(
+        "Article", "articles.ArticlePage,articles.FocusedArticlePage"
+    )
+    types_filter.add_filter_option(
+        "Gallery", "collections.HighlightGalleryPage"
+    )
+    types_filter.add_filter_option(
+        "Records revealed", "articles.RecordArticlePage"
+    )
+    types_filter.add_filter_option(
+        "Time period", "collections.TimePeriodExplorerPage"
+    )
+    types_filter.add_filter_option("Topic", "collections.TopicExplorerPage")
+    filters.append(types_filter)
 
     return filters
