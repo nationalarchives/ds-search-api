@@ -8,13 +8,8 @@ class WagtailAPI(GetAPI):
     def __init__(self):
         self.api_url = Config().WAGTAIL_API_URL
 
-    def build_query_string(self) -> str:
-        return "&".join(
-            ["=".join((key, str(value))) for key, value in self.filters.items()]
-        )
-
     def get_results(self) -> dict:
-        url = f"{self.api_url}/pages/?{self.build_query_string()}"
+        url = f"{self.api_url}/pages/{self.build_query_string()}"
         return self.execute(url)
 
 
@@ -26,7 +21,7 @@ class WebsiteArticles(WagtailAPI):
         offset = (page - 1) * self.results_per_page
         self.add_parameter("offset", offset)
         self.add_parameter("limit", self.results_per_page)
-        url = f"{self.api_url}/pages/?{self.build_query_string()}"
+        url = f"{self.api_url}/pages/{self.build_query_string()}"
         raw_results = self.execute(url)
         response = ArticleSearchResults()
         for a in raw_results["items"]:
@@ -50,6 +45,7 @@ class WebsiteArticles(WagtailAPI):
 def get_time_periods():
     api = WagtailAPI()
     # api.results_per_page = 100  # TODO: Make higher
+    api.params = {}  # TODO: Why isn't this blank by default?
     api.add_parameter("child_of", 54)  # TODO: Make variable
     results = api.get_results()
     time_periods = [
@@ -62,10 +58,11 @@ def get_time_periods():
 def get_topics():
     api = WagtailAPI()
     # api.results_per_page = 100  # TODO: Make higher
+    api.params = {}  # TODO: Why isn't this blank by default?
     api.add_parameter("child_of", 53)  # TODO: Make variable
     results = api.get_results()
     topics = [
-        {"name": topics["title"], "value": topics["id"]}
-        for topics in results["items"]
+        {"name": topic["title"], "value": topic["id"]}
+        for topic in results["items"]
     ]
     return topics

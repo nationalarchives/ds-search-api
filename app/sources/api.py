@@ -2,8 +2,6 @@ from abc import ABC, abstractmethod
 
 import requests
 
-# from flask import current_app
-
 
 class BaseAPI(ABC):
     @abstractmethod
@@ -13,21 +11,32 @@ class BaseAPI(ABC):
 
 class GetAPI(BaseAPI):
     results_per_page: int = 20
-    filters: dict = {}
+    params: dict = {}
 
     def add_parameter(self, key: str, value: str | int) -> None:
-        self.filters[key] = value
+        self.params[key] = value
+
+    def build_query_string(self) -> str:
+        return (
+            "?"
+            + "&".join(
+                [
+                    "=".join((key, str(value)))
+                    for key, value in self.params.items()
+                ]
+            )
+            if len(self.params)
+            else ""
+        )
 
     def execute(self, url: str) -> dict:
         r = requests.get(url)
         if r.status_code == 404:
-            # current_app.logger.error(f"Resource not found: {url}")
             raise Exception("Resource not found")
             return {}
         if r.status_code == requests.codes.ok:
             try:
                 return r.json()
             except requests.exceptions.JSONDecodeError:
-                # current_app.logger.error("API provided non-JSON response")
                 raise ConnectionError("API provided non-JSON response")
         raise ConnectionError("Request to API failed")

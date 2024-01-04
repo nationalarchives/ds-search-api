@@ -17,14 +17,18 @@ async def index(
 @router.get("/filters/")
 async def filters() -> list[ArticleFilter]:
     filters = []
+
     time_period_filter = ArticleFilter("Time period")
     for time_period in get_time_periods():
         time_period_filter.add_filter_option(
             time_period["name"], time_period["value"]
         )
     filters.append(time_period_filter)
+
     topics_filter = ArticleFilter("Topics")
-    for topic in get_topics():
+    topics = get_topics()
+    for topic in sorted(topics, key=lambda x: x['name']):
         topics_filter.add_filter_option(topic["name"], topic["value"])
     filters.append(topics_filter)
+
     return filters
