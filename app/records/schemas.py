@@ -3,9 +3,7 @@ from pydantic import ConfigDict
 
 
 class Record(APIResult):
-    id: str = ""
     ref: str | None = ""
-    title: str = ""
 
     def __str__(self):
         return f"Record {self.id}"

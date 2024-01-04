@@ -30,6 +30,12 @@ class WebsiteArticles(GetAPI):
             article.type = a["meta"]["type"]
             article.id = a["id"]
             article.first_published = a["meta"]["first_published_at"]
+            # TODO: See if Wagtail can't give us this in the search results
+            page_details_api = WebsiteArticles()
+            page_details_url = f"{self.api_url}/pages/{article.id}"
+            page_details = page_details_api.execute(page_details_url)
+            article.description = page_details["meta"]["search_description"]
+            article.image = page_details["teaser_image_jpg"]
             response.results.append(article)
         response.count = raw_results["meta"]["total_count"]
         return response.toJSON()

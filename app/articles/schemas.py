@@ -3,11 +3,10 @@ from pydantic import ConfigDict
 
 
 class Article(APIResult):
-    title: str = ""
     url: str = ""
     type: str = ""
-    id: int = 0
     first_published: str = ""
+    image: dict | None = None
 
     def __str__(self):
         return f"Article {self.title}"
