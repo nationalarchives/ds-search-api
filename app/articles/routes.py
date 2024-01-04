@@ -22,9 +22,9 @@ async def filters() -> list[ArticleFilter]:
         time_period_filter.add_filter_option(
             time_period["name"], time_period["value"]
         )
-    filters.filters.append(time_period_filter)
+    filters.append(time_period_filter)
     topics_filter = ArticleFilter("Topics")
     for topic in get_topics():
         topics_filter.add_filter_option(topic["name"], topic["value"])
-    filters.filters.append(topics_filter)
+    filters.append(topics_filter)
     return filters
