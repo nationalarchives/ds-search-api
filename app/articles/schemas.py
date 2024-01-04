@@ -1,5 +1,5 @@
 from app.schemas import APIResponse, APIResult
-from pydantic import ConfigDict
+from pydantic import BaseModel, ConfigDict
 
 
 class Article(APIResult):
@@ -20,3 +20,28 @@ class ArticleSearchResults(APIResponse):
 
     count: int = 0
     results: list[Article] = []
+
+
+class ArticleFilterOption(BaseModel):
+    name: str = ""
+    value: str | int = ""
+
+    def __init__(self, name, value):
+        super().__init__()
+        self.name = name
+        self.value = value
+
+
+class ArticleFilter(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    title: str = ""
+    options: list[ArticleFilterOption] = []
+
+    def __init__(self, title):
+        super().__init__()
+        self.title = title
+
+    def add_filter_option(self, name, value):
+        option = ArticleFilterOption(name, value)
+        self.options.append(option)

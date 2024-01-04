@@ -4,17 +4,23 @@ from config import Config
 from .api import GetAPI
 
 
-class WebsiteArticles(GetAPI):
+class WagtailAPI(GetAPI):
     def __init__(self):
         self.api_url = Config().WAGTAIL_API_URL
-
-    def add_query(self, query_string: str) -> None:
-        self.add_parameter("search", query_string)
 
     def build_query_string(self) -> str:
         return "&".join(
             ["=".join((key, str(value))) for key, value in self.filters.items()]
         )
+
+    def get_results(self) -> dict:
+        url = f"{self.api_url}/pages/?{self.build_query_string()}"
+        return self.execute(url)
+
+
+class WebsiteArticles(WagtailAPI):
+    def add_query(self, query_string: str) -> None:
+        self.add_parameter("search", query_string)
 
     def get_results(self, page: int | None = 1) -> dict:
         offset = (page - 1) * self.results_per_page
@@ -39,3 +45,27 @@ class WebsiteArticles(GetAPI):
             response.results.append(article)
         response.count = raw_results["meta"]["total_count"]
         return response.toJSON()
+
+
+def get_time_periods():
+    api = WagtailAPI()
+    # api.results_per_page = 100  # TODO: Make higher
+    api.add_parameter("child_of", 54)  # TODO: Make variable
+    results = api.get_results()
+    time_periods = [
+        {"name": time_period["title"], "value": time_period["id"]}
+        for time_period in results["items"]
+    ]
+    return time_periods
+
+
+def get_topics():
+    api = WagtailAPI()
+    # api.results_per_page = 100  # TODO: Make higher
+    api.add_parameter("child_of", 53)  # TODO: Make variable
+    results = api.get_results()
+    topics = [
+        {"name": topics["title"], "value": topics["id"]}
+        for topics in results["items"]
+    ]
+    return topics
