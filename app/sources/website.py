@@ -46,7 +46,8 @@ class WebsiteArticles(WagtailAPI):
             article.image = page_details["teaser_image_jpg"]
             response.results.append(article)
         response.count = raw_results["meta"]["total_count"]
-        response.pages = math.ceil(response.count / self.results_per_page)
+        response.results_per_page = self.results_per_page
+        response.page = page
         return response.toJSON()
 
 

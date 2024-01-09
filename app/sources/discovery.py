@@ -27,5 +27,8 @@ class DiscoveryRecords(GetAPI):
             record.title = r["title"]
             response.results.append(record)
         response.count = raw_results["count"]
-        response.pages = math.ceil(response.count / self.results_per_page)
-        return response.toJSON()
+        response.results_per_page = self.results_per_page
+        response.page = page
+        return (
+            response.toJSON() if response.page_in_range() else {"None": "None"}
+        )
