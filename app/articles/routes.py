@@ -6,7 +6,10 @@ from .schemas import ArticleFilter, ArticleSearchResults
 
 @router.get("/")
 async def index(
-    q: str | None = None, type: str | None = None, page: int | None = 1
+    q: str | None = None,
+    type: str | None = None,
+    order: str | None = None,
+    page: int | None = 1,
 ) -> ArticleSearchResults:
     website_api = WebsiteArticles()
     website_api.params = {}  # TODO: Why are params persisting?
@@ -28,6 +31,14 @@ async def index(
                 ]
             ),
         )
+    if order == "alphabetical" or order == "alphabetical:asc":
+        website_api.add_parameter("order", "title")
+    elif order == "alphabetical:desc":
+        website_api.add_parameter("order", "-title")
+    elif order == "date" or order == "alphabetical:desc":
+        website_api.add_parameter("order", "first_published_at")
+    elif order == "alphabetical:asc":
+        website_api.add_parameter("order", "-first_published_at")
     results = website_api.get_results(page)
     return results
 
