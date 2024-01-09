@@ -7,6 +7,7 @@ class APIResponse(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     count: int = 0
+    pages: int = 0
     results: list[APIResult] = []
 
     def toJSON(self):

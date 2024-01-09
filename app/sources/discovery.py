@@ -1,3 +1,5 @@
+import math
+
 from app.records.schemas import Record, RecordSearchResults
 from config import Config
 
@@ -25,4 +27,5 @@ class DiscoveryRecords(GetAPI):
             record.title = r["title"]
             response.results.append(record)
         response.count = raw_results["count"]
+        response.pages = math.ceil(response.count / self.results_per_page)
         return response.toJSON()
