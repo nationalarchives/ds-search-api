@@ -35,9 +35,9 @@ async def index(
         website_api.add_parameter("order", "title")
     elif order == "alphabetical:desc":
         website_api.add_parameter("order", "-title")
-    elif order == "date" or order == "alphabetical:desc":
+    elif order == "date" or order == "date:desc":
         website_api.add_parameter("order", "first_published_at")
-    elif order == "alphabetical:asc":
+    elif order == "date:asc":
         website_api.add_parameter("order", "-first_published_at")
     results = website_api.get_results(page)
     return results
