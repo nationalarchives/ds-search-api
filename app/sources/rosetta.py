@@ -17,6 +17,7 @@ class RosettaRecords(GetAPI):
         offset = (page - 1) * self.results_per_page
         self.add_parameter("size", self.results_per_page)
         self.add_parameter("from", offset)
+        # self.add_parameter("filter", "group:(tna)")
         url = f"{self.api_url}/search{self.build_query_string()}"
         raw_results = self.execute(url)
         response = RecordSearchResults()
@@ -24,12 +25,17 @@ class RosettaRecords(GetAPI):
         for r in raw_results["metadata"]:
             record = Record()
             record.id = r["id"]
+            details = r["detail"]["@template"]["details"]
             record.ref = (
-                r["detail"]["@template"]["details"]["referenceNumber"]
-                if "referenceNumber" in r["detail"]["@template"]["details"]
+                details["referenceNumber"]
+                if "referenceNumber" in details
                 else None
             )
             record.title = r["summaryTitle"]
+            record.covering_date = (
+                details["dateCovering"] if "dateCovering" in details else None
+            )
+            record.held_by = details["heldBy"] if "heldBy" in details else None
             response.results.append(record)
         response.count = raw_results["stats"]["total"]
         response.results_per_page = self.results_per_page

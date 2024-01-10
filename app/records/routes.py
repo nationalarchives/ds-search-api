@@ -5,9 +5,7 @@ from .schemas import RecordSearchResults
 
 
 @router.get("/")
-async def index(
-    q: str | None = "*", page: int | None = 1
-) -> RecordSearchResults:
+async def index(q: str, page: int | None = 1) -> RecordSearchResults:
     discovery_api = RosettaRecords()
     discovery_api.add_query(q or "*")
     results = discovery_api.get_results(page)
