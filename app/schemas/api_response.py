@@ -32,7 +32,9 @@ class APIResponse(BaseModel):
         return page_max if page_max <= self.count else self.count
 
     def page_in_range(self):
-        return self.page > 0 and self.page <= self.get_pages()
+        return self.get_pages() == 0 or (
+            self.page > 0 and self.page <= self.get_pages()
+        )
 
     def toJSON(self):
         if self.page_in_range():
