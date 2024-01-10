@@ -28,7 +28,8 @@ class APIResponse(BaseModel):
         return (self.results_per_page * (self.page - 1)) + 1
 
     def get_result_range_max(self):
-        return self.results_per_page * self.page
+        page_max = self.results_per_page * self.page
+        return page_max if page_max <= self.count else self.count
 
     def page_in_range(self):
         return self.page > 0 and self.page <= self.get_pages()
