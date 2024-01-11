@@ -19,8 +19,6 @@ class RosettaRecords(GetAPI):
         offset = (page - 1) * self.results_per_page
         self.add_parameter("size", self.results_per_page)
         self.add_parameter("from", offset)
-        self.add_parameter("filter", "group:(tna)")
-        # group:(tna,digitised,nonTna,creator,archive)
         url = f"{self.api_url}/search{self.build_query_string()}"
         raw_results = self.execute(url)
         response = RecordSearchResults()

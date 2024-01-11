@@ -7,10 +7,16 @@ from .schemas import RecordSearchResults
 
 @router.get("/")
 async def index(
-    q: str = "", page: int | None = 1, highlight: bool | None = False
+    q: str = "",
+    page: int | None = 1,
+    group: str | None = None,
+    highlight: bool | None = False,
 ) -> RecordSearchResults:
     rosetta_api = RosettaRecords()
     rosetta_api.add_query(q)
+    if group:
+        # group:(tna,digitised,nonTna,creator,archive)
+        rosetta_api.add_parameter("filter", f"group:({group})")
     results = rosetta_api.get_results(page, highlight)
     return results
 
