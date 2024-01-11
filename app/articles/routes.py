@@ -1,7 +1,8 @@
 from app.articles import router
+from app.schemas import Filter
 from app.sources.website import WebsiteArticles, get_time_periods, get_topics
 
-from .schemas import ArticleFilter, ArticleSearchResults
+from .schemas import ArticleSearchResults
 
 
 @router.get("/")
@@ -44,23 +45,23 @@ async def index(
 
 
 @router.get("/filters/")
-async def filters() -> list[ArticleFilter]:
+async def filters() -> list[Filter]:
     filters = []
 
-    # time_period_filter = ArticleFilter("Time period")
+    # time_period_filter = Filter("Time period", "multiple")
     # for time_period in get_time_periods():
     #     time_period_filter.add_filter_option(
     #         time_period["name"], time_period["value"]
     #     )
     # filters.append(time_period_filter)
 
-    # topics_filter = ArticleFilter("Topic")
+    # topics_filter = Filter("Topic", "multiple")
     # topics = get_topics()
     # for topic in sorted(topics, key=lambda x: x["name"]):
     #     topics_filter.add_filter_option(topic["name"], topic["value"])
     # filters.append(topics_filter)
 
-    types_filter = ArticleFilter("Type")
+    types_filter = Filter("Type", "multiple")
     types_filter.add_filter_option(
         "Article", "articles.ArticlePage,articles.FocusedArticlePage"
     )
