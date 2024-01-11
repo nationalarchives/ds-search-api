@@ -6,9 +6,9 @@ def create_app():
     config = Config()
     app = FastAPI(log_level=config.LOG_LEVEL)
 
-    @app.get("/healthcheck/live", include_in_schema=False)
+    @app.get("/healthcheck/live/", include_in_schema=False)
     def healthcheck():
-        return "ok"
+        return {"status": "ok"}
 
     from .articles import routes as article_routes
     from .records import routes as record_routes
