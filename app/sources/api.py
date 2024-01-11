@@ -1,3 +1,4 @@
+import urllib.parse
 from abc import ABC, abstractmethod
 
 import requests
@@ -18,13 +19,7 @@ class GetAPI(BaseAPI):
 
     def build_query_string(self) -> str:
         return (
-            "?"
-            + "&".join(
-                [
-                    "=".join((key, str(value)))
-                    for key, value in self.params.items()
-                ]
-            )
+            "?" + urllib.parse.urlencode(self.params)
             if len(self.params)
             else ""
         )
@@ -33,7 +28,6 @@ class GetAPI(BaseAPI):
         r = requests.get(url)
         if r.status_code == 404:
             raise Exception("Resource not found")
-            return {}
         if r.status_code == requests.codes.ok:
             try:
                 return r.json()

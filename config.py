@@ -10,3 +10,6 @@ class Config:
     LOG_LEVEL = os.getenv("LOG_LEVEL", "info")
     ROSETTA_API_URL = os.environ.get("ROSETTA_API_URL").rstrip("/")
     WAGTAIL_API_URL = os.environ.get("WAGTAIL_API_URL").rstrip("/")
+    ELASTICSEARCH_RESULTS_LIMIT = int(
+        os.environ.get("ELASTICSEARCH_RESULTS_LIMIT", "10000")
+    )
