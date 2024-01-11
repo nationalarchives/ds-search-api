@@ -9,14 +9,14 @@ from .schemas import RecordSearchResults
 async def index(
     q: str = "",
     page: int | None = 1,
-    group: str | None = None,
+    groups: str | None = None,
     highlight: bool | None = False,
 ) -> RecordSearchResults:
     rosetta_api = RosettaRecords()
     rosetta_api.add_query(q)
-    if group:
+    if groups:
         # group:(tna,digitised,nonTna,creator,archive)
-        rosetta_api.add_parameter("filter", f"group:({group})")
+        rosetta_api.add_parameter("filter", f"group:({groups})")
     results = rosetta_api.get_results(page, highlight)
     return results
 
