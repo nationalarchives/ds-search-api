@@ -286,6 +286,17 @@ class RosettaSourceParser:
                         if doc_value := document(tag).text():
                             return doc_value
                 return description
+            if default_description := next(
+                (
+                    item["value"]
+                    for item in self.source["description"]
+                    if "value" in item
+                    and "type" in item
+                    and item["type"] == "description"
+                ),
+                None,
+            ):
+                return default_description
         return ""
 
     def functions(self) -> str:
