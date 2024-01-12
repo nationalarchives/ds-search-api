@@ -76,8 +76,8 @@ class RosettaSourceParser:
         return ""
 
     def names(self) -> dict:
+        names = {}
         if "name" in self.source:
-            names = {}
             if name_data := next(
                 (
                     item
@@ -109,7 +109,7 @@ class RosettaSourceParser:
                 None,
             ):
                 names["alternative_names"] = aka
-        return {}
+        return names
 
     def date(self) -> str:
         return self.lifespan() or self.date_range() or ""
