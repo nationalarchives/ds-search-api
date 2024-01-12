@@ -24,6 +24,7 @@ class Record(Details):
     held_by: dict | None = None
     legal_status: str | None = None
     closure_status: str | None = None
+    languages: list[str] | None = None
 
     def __init__(self, id: str):
         super().__init__(id)

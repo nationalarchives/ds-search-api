@@ -493,3 +493,12 @@ class RosettaSourceParser:
             and "value" in self.source["availability"]["closure"]["label"]
             else ""
         )
+
+    def languages(self) -> list[str]:
+        if "language" in self.source:
+            return [
+                language["value"]
+                for language in self.source["language"]
+                if "value" in language
+            ]
+        return []
