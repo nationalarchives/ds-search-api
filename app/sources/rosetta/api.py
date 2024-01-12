@@ -88,9 +88,12 @@ class RosettaRecordDetails(RosettaRecords):
             record = Record(parsed_data.id())
             record.ref = parsed_data.identifier()
             record.title = parsed_data.title()
+            record.description = parsed_data.description()
             record.date = parsed_data.date_range()
             record.is_digitised = parsed_data.is_digitised()
             record.held_by = parsed_data.held_by()
+            record.legal_status = parsed_data.legal_status()
+            record.closure_status = parsed_data.closure_status()
             return record.toJSON()
         if (
             parsed_data.type() == "archive"

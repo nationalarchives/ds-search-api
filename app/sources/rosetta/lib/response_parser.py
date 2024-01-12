@@ -273,7 +273,10 @@ class RosettaSourceParser:
                 None,
             ):
                 if "value" in description:
-                    return self.strip_scope_and_content(description["value"])
+                    return description["value"]
+                    return self.strip_scope_and_content(
+                        description["value"]
+                    )  # TODO: Breaks on C17371160
                 elif (
                     "ephemera" in description
                     and "value" in description["ephemera"]
@@ -473,3 +476,20 @@ class RosettaSourceParser:
             if id and name:
                 return {"id": id, "name": name}
         return {}
+
+    def legal_status(self) -> str:
+        return (
+            self.source["legal"]["status"]
+            if "legal" in self.source and "status" in self.source["legal"]
+            else ""
+        )
+
+    def closure_status(self) -> str:
+        return (
+            self.source["availability"]["closure"]["label"]["value"]
+            if "availability" in self.source
+            and "closure" in self.source["availability"]
+            and "label" in self.source["availability"]["closure"]
+            and "value" in self.source["availability"]["closure"]["label"]
+            else ""
+        )

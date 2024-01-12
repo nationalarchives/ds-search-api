@@ -18,9 +18,12 @@ class Record(Details):
     type: str = "record"
     ref: str | None = None
     title: str = ""
+    description: str = ""
     date: str = ""
     is_digitised: bool | None = None
     held_by: dict | None = None
+    legal_status: str | None = None
+    closure_status: str | None = None
 
     def __init__(self, id: str):
         super().__init__(id)
