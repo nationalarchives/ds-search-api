@@ -505,6 +505,16 @@ class RosettaSourceParser:
             else ""
         )
 
+    def access_condition(self) -> str:
+        return (
+            self.source["availability"]["access"]["condition"]["value"]
+            if "availability" in self.source
+            and "access" in self.source["availability"]
+            and "condition" in self.source["availability"]["access"]
+            and "value" in self.source["availability"]["access"]["condition"]
+            else ""
+        )
+
     def languages(self) -> list[str]:
         if "language" in self.source:
             return [

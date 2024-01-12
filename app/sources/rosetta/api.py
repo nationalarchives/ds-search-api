@@ -95,6 +95,7 @@ class RosettaRecordDetails(RosettaRecords):
             record.legal_status = parsed_data.legal_status()
             record.closure_status = parsed_data.closure_status()
             record.languages = parsed_data.languages()
+            record.access_condition = parsed_data.access_condition()
             return record.toJSON()
         if (
             parsed_data.type() == "archive"
