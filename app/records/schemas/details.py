@@ -31,17 +31,6 @@ class Record(Details):
         super().__init__(id)
 
 
-class ExternalRecord(Details):
-    type: str = "external_record"
-    ref: str | None = None
-    title: str = ""
-    covering_date: str | None = None
-    held_by: dict | None = None
-
-    def __init__(self, id: str):
-        super().__init__(id)
-
-
 class RecordCreator(Details):
     type: str = "creator"
     name: str = ""

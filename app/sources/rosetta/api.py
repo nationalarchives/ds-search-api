@@ -1,6 +1,5 @@
 from app.lib.api import GetAPI
 from app.records.schemas import (
-    ExternalRecord,
     Record,
     RecordArchive,
     RecordCreator,
@@ -43,12 +42,17 @@ class RosettaRecordsSearch(RosettaRecords):
         for r in raw_results["metadata"]:
             parsed_data = RosettaSourceParser(r["_source"])
             record = RecordSearchResult()
+            type = parsed_data.type()
+            if type == "repository":
+                type = "archive"
+            if type == "agent":
+                type = "creator"
+                if parsed_data.actual_type() == "person":
+                    type = "person"
+            record.type = type
             record.id = parsed_data.id()
-            details = r["detail"]["@template"]["details"]
             record.ref = parsed_data.reference_number()
-            record.title = (
-                details["summaryTitle"] if "summaryTitle" in details else None
-            )
+            record.title = parsed_data.title()
             record.description = parsed_data.description()
             record.date = parsed_data.date()
             record.held_by = parsed_data.held_by()
@@ -84,7 +88,6 @@ class RosettaRecordDetails(RosettaRecords):
     def parse_results(self, raw_results):
         parsed_data = RosettaResponseParser(raw_results)
         if parsed_data.type() == "record":
-            # TODO: ExternalRecord
             record = Record(parsed_data.id())
             record.ref = parsed_data.identifier()
             record.title = parsed_data.title()

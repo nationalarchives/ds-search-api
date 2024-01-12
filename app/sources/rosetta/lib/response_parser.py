@@ -273,7 +273,6 @@ class RosettaSourceParser:
                 None,
             ):
                 if "value" in description:
-                    return description["value"]
                     return self.strip_scope_and_content(
                         description["value"]
                     )  # TODO: Breaks on C17371160
@@ -285,7 +284,6 @@ class RosettaSourceParser:
                     for tag in ("foa", "function", "address"):
                         if doc_value := document(tag).text():
                             return doc_value
-                return description
             if default_description := next(
                 (
                     item["value"]

@@ -1,4 +1,5 @@
 import urllib.parse
+import uuid
 from abc import ABC, abstractmethod
 
 import requests
@@ -19,12 +20,13 @@ class GetAPI(BaseAPI):
     def add_parameter(self, key: str, value: str | int) -> None:
         self.params[key] = value
 
+    def invalidator(self) -> str:
+        return uuid.uuid4()
+
     def build_query_string(self) -> str:
-        return (
-            "?" + urllib.parse.urlencode(self.params)
-            if len(self.params)
-            else ""
-        )
+        params = self.params
+        params["invalidator"] = self.invalidator()
+        return "?" + urllib.parse.urlencode(params) if len(params) else ""
 
     def build_url(self) -> str:
         return f"{self.api_base_url}{self.api_path}{self.build_query_string()}"

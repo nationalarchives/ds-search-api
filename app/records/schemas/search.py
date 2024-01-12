@@ -3,6 +3,7 @@ from pydantic import ConfigDict
 
 
 class RecordSearchResult(APISearchResult):
+    type: str = ""
     ref: str | None = None
     date: str | None = None
     held_by: dict | None = None

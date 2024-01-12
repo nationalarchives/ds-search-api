@@ -2,13 +2,7 @@ from app.records import router
 from app.schemas import Filter
 from app.sources.rosetta import RosettaRecordDetails, RosettaRecordsSearch
 
-from .schemas import (
-    ExternalRecord,
-    Record,
-    RecordArchive,
-    RecordCreator,
-    RecordSearchResults,
-)
+from .schemas import Record, RecordArchive, RecordCreator, RecordSearchResults
 
 
 @router.get("/")
@@ -54,13 +48,17 @@ async def filters() -> list[Filter]:
     return filters
 
 
-@router.get("/{item_id}/")
-async def item(
-    item_id: str,
-):  # ) -> Record | ExternalRecord | RecordCreator | RecordArchive:
-    rosetta_api = RosettaRecordDetails()
-    result = rosetta_api.get_result(item_id)
-    return result
+@router.get("/internal/")
+async def internal(
+    q: str = "",
+    page: int | None = 1,
+    highlight: bool | None = False,
+) -> RecordSearchResults:
+    rosetta_api = RosettaRecordsSearch()
+    rosetta_api.add_query(q)
+    rosetta_api.add_parameter("filter", "group:(tna)")
+    results = rosetta_api.get_result(page, highlight)
+    return results
 
 
 @router.get("/external/")
@@ -69,7 +67,11 @@ async def external(
     page: int | None = 1,
     highlight: bool | None = False,
 ) -> RecordSearchResults:
-    return index(q, page, "nonTna", highlight)
+    rosetta_api = RosettaRecordsSearch()
+    rosetta_api.add_query(q)
+    rosetta_api.add_parameter("filter", "group:(nonTna)")
+    results = rosetta_api.get_result(page, highlight)
+    return results
 
 
 @router.get("/external/filters/")
@@ -84,7 +86,11 @@ async def creators(
     page: int | None = 1,
     highlight: bool | None = False,
 ) -> RecordSearchResults:
-    return index(q, page, "creator", highlight)
+    rosetta_api = RosettaRecordsSearch()
+    rosetta_api.add_query(q)
+    rosetta_api.add_parameter("filter", "group:(creator)")
+    results = rosetta_api.get_result(page, highlight)
+    return results
 
 
 @router.get("/creators/filters/")
@@ -99,10 +105,23 @@ async def archives(
     page: int | None = 1,
     highlight: bool | None = False,
 ) -> RecordSearchResults:
-    return index(q, page, "archive", highlight)
+    rosetta_api = RosettaRecordsSearch()
+    rosetta_api.add_query(q)
+    rosetta_api.add_parameter("filter", "group:(archive)")
+    results = rosetta_api.get_result(page, highlight)
+    return results
 
 
 @router.get("/archives/filters/")
 async def archives_filters() -> list[Filter]:
     filters = []
     return filters
+
+
+@router.get("/{item_id}/")
+async def item(
+    item_id: str,
+):  # ) -> Record | RecordCreator | RecordArchive:
+    rosetta_api = RosettaRecordDetails()
+    result = rosetta_api.get_result(item_id)
+    return result

@@ -1,6 +1,5 @@
 from .details import (
     Details,
-    ExternalRecord,
     Record,
     RecordArchive,
     RecordCreator,
