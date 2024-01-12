@@ -1,0 +1,154 @@
+from app.lib.api import GetAPI
+from app.records.schemas import (
+    ExternalRecord,
+    Record,
+    RecordArchive,
+    RecordCreator,
+    RecordCreatorPerson,
+    RecordSearchResult,
+    RecordSearchResults,
+)
+from config import Config
+
+from .lib import RosettaResponseParser
+
+
+class RosettaRecords(GetAPI):
+    def __init__(self):
+        self.api_base_url = Config().ROSETTA_API_URL
+
+
+class RosettaRecordsSearch(RosettaRecords):
+    def __init__(self):
+        super().__init__()
+        self.api_path = "/search"
+
+    def add_query(self, query_string: str) -> None:
+        self.add_parameter("q", query_string)
+
+    def get_result(
+        self, page: int | None = 1, highlight: bool | None = False
+    ) -> dict:
+        offset = (page - 1) * self.results_per_page
+        self.add_parameter("size", self.results_per_page)
+        self.add_parameter("from", offset)
+        url = self.build_url()
+        print(url)
+        raw_results = self.execute(url)
+        return self.parse_results(raw_results, page)
+
+    def parse_results(self, raw_results, page):
+        response = RecordSearchResults()
+        for r in raw_results["metadata"]:
+            record = RecordSearchResult()
+            record.id = r["id"]
+            details = r["detail"]["@template"]["details"]
+            record.ref = (
+                details["referenceNumber"]
+                if "referenceNumber" in details
+                else None
+            )
+            record.title = (
+                details["summaryTitle"] if "summaryTitle" in details else None
+            )
+            record.description = (
+                details["description"][0] if "description" in details else None
+            )
+            record.covering_date = (
+                details["dateCovering"] if "dateCovering" in details else None
+            )
+            record.held_by = details["heldBy"] if "heldBy" in details else None
+            # if highlight and "highLight" in r:
+            #     if "@template.details.summaryTitle" in r["highLight"]:
+            #         record.title = r["highLight"]["@template.details.summaryTitle"][0]
+            #     if "@template.details.description" in r["highLight"]:
+            #         record.title = r["highLight"]["@template.details.description"][0]
+            response.results.append(record)
+        response.count = (
+            raw_results["stats"]["total"]
+            if raw_results["stats"]["total"] <= 10000
+            else 10000
+        )
+        response.results_per_page = self.results_per_page
+        response.page = page
+        return response.toJSON() if response.page_in_range() else {}
+
+
+class RosettaRecordDetails(RosettaRecords):
+    def __init__(self):
+        super().__init__()
+        self.api_path = "/fetch"
+
+    def get_result(self, id: str) -> dict:
+        self.add_parameter("id", id)
+        self.add_parameter("includeSource", True)
+        url = self.build_url()
+        print(url)
+        raw_results = self.execute(url)
+        return self.parse_results(raw_results)
+
+    def parse_results(self, raw_results):
+        parsed_data = RosettaResponseParser(raw_results)
+        # dump = {
+        #     "actual_type": parsed_data.actual_type(),
+        #     "type": parsed_data.type(),
+        #     "title": parsed_data.title(),
+        #     "name": parsed_data.name(),
+        #     "names": parsed_data.names(),
+        #     "date": parsed_data.date(),
+        #     "lifespan": parsed_data.lifespan(),
+        #     "date_range": parsed_data.date_range(),
+        #     "places": parsed_data.places(),
+        #     "gender": parsed_data.gender(),
+        #     "contact_info": parsed_data.contact_info(),
+        #     "description": parsed_data.description(),
+        #     "functions": parsed_data.functions(),
+        #     "history": parsed_data.history(),
+        #     "biography": parsed_data.biography(),
+        #     "identifier": parsed_data.identifier(),
+        #     "reference_number": parsed_data.reference_number(),
+        #     # 'agents': parsed_data.agents()
+        # }
+        if parsed_data.type() == "record":
+            # TODO: ExternalRecord
+            record = Record(parsed_data.id())
+            record.ref = ""
+            record.title = parsed_data.title()
+            record.date = parsed_data.date_range()
+            record.is_digitised = parsed_data.is_digitised()
+            # record.dump = dump
+            return record.toJSON()
+        if (
+            parsed_data.type() == "archive"
+            or parsed_data.type() == "repository"
+        ):
+            # return raw_results
+            record = RecordArchive(parsed_data.id())
+            record.name = parsed_data.title()
+            record.archon = parsed_data.reference_number()
+            record.places = parsed_data.places()
+            record.contact_info = parsed_data.contact_info()
+            record.agents = parsed_data.agents()
+            # record.dump = dump
+            return record.toJSON()
+        if parsed_data.type() == "agent":
+            if parsed_data.actual_type() == "person":
+                record = RecordCreatorPerson(parsed_data.id())
+                record.name = parsed_data.name()
+                record.name_parts = parsed_data.names()
+                record.date = parsed_data.lifespan()
+                record.gender = parsed_data.gender()
+                record.identifier = parsed_data.identifier()
+                record.functions = parsed_data.functions()
+                record.history = parsed_data.functions()
+                record.biography = parsed_data.biography()
+                return record.toJSON()
+            record = RecordCreator(parsed_data.id())
+            record.name = parsed_data.title()
+            record.date = parsed_data.date()
+            record.places = parsed_data.places()
+            record.identifier = parsed_data.identifier()
+            record.history = parsed_data.functions()
+            # record.dump = dump
+            return record.toJSON()
+        return {}

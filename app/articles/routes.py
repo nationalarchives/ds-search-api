@@ -40,7 +40,7 @@ async def index(
         website_api.add_parameter("order", "-first_published_at")
     elif order == "date:asc":
         website_api.add_parameter("order", "first_published_at")
-    results = website_api.get_results(page)
+    results = website_api.get_result(page)
     return results
 
 

@@ -13,6 +13,7 @@ flake8 = "^6.1.0"
 isort = "^5.12.0"
 requests = "^2.31.0"
 fastapi = "^0.108.0"
+pyquery = "^2.0.0"
 
 [build-system]
 requires = ["poetry-core"]

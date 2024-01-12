@@ -1,16 +1,15 @@
 import math
 
 from app.articles.schemas import Article, ArticleSearchResults
+from app.lib.api import GetAPI
 from config import Config
-
-from .api import GetAPI
 
 
 class WagtailAPI(GetAPI):
     def __init__(self):
         self.api_url = Config().WAGTAIL_API_URL
 
-    def get_results(self) -> dict:
+    def get_result(self) -> dict:
         url = f"{self.api_url}/pages/{self.build_query_string()}"
         return self.execute(url)
 
@@ -19,7 +18,7 @@ class WebsiteArticles(WagtailAPI):
     def add_query(self, query_string: str) -> None:
         self.add_parameter("search", query_string)
 
-    def get_results(self, page: int | None = 1) -> dict:
+    def get_result(self, page: int | None = 1) -> dict:
         offset = (page - 1) * self.results_per_page
         self.add_parameter("offset", offset)
         self.add_parameter("limit", self.results_per_page)
@@ -56,7 +55,7 @@ def get_time_periods():
     # api.results_per_page = 100  # TODO: Make higher
     api.params = {}  # TODO: Why isn't this blank by default?
     api.add_parameter("child_of", 54)  # TODO: Make variable
-    results = api.get_results()
+    results = api.get_result()
     time_periods = [
         {"name": time_period["title"], "value": time_period["id"]}
         for time_period in results["items"]
@@ -69,7 +68,7 @@ def get_topics():
     # api.results_per_page = 100  # TODO: Make higher
     api.params = {}  # TODO: Why isn't this blank by default?
     api.add_parameter("child_of", 53)  # TODO: Make variable
-    results = api.get_results()
+    results = api.get_result()
     topics = [
         {"name": topic["title"], "value": topic["id"]}
         for topic in results["items"]

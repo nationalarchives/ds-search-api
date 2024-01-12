@@ -6,11 +6,13 @@ import requests
 
 class BaseAPI(ABC):
     @abstractmethod
-    def get_results(self):
+    def get_result(self):
         pass
 
 
 class GetAPI(BaseAPI):
+    api_base_url: str
+    api_path: str = "/"
     results_per_page: int = 20
     params: dict = {}
 
@@ -23,6 +25,9 @@ class GetAPI(BaseAPI):
             if len(self.params)
             else ""
         )
+
+    def build_url(self) -> str:
+        return f"{self.api_base_url}{self.api_path}{self.build_query_string()}"
 
     def execute(self, url: str) -> dict:
         r = requests.get(url)

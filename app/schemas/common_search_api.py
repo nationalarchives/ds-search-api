@@ -3,10 +3,17 @@ import math
 from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict
 
-from .api_result import APIResult
+
+class APISearchResult(BaseModel):
+    title: str | None = None
+    id: int | str = ""
+    description: str | None = None
+
+    def toJSON(self):
+        return self.__dict__
 
 
-class APIResponse(BaseModel):
+class APISearchResponse(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     count: int = 0
@@ -15,7 +22,7 @@ class APIResponse(BaseModel):
     result_range_min: int = 0
     result_range_max: int = 0
     results_per_page: int = 0
-    results: list[APIResult] = []
+    results: list[APISearchResult] = []
 
     def get_pages(self):
         return (

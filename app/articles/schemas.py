@@ -1,8 +1,8 @@
-from app.schemas import APIResponse, APIResult
+from app.schemas import APISearchResponse, APISearchResult
 from pydantic import ConfigDict
 
 
-class Article(APIResult):
+class Article(APISearchResult):
     url: str = ""
     type: str = ""
     first_published: str = ""
@@ -15,7 +15,7 @@ class Article(APIResult):
         return self.__dict__
 
 
-class ArticleSearchResults(APIResponse):
+class ArticleSearchResults(APISearchResponse):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     results: list[Article] = []

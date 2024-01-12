@@ -1,10 +1,8 @@
-import math
-
-from app.schemas import APIResponse, APIResult
+from app.schemas import APISearchResponse, APISearchResult
 from pydantic import ConfigDict
 
 
-class Record(APIResult):
+class RecordSearchResult(APISearchResult):
     ref: str | None = None
     covering_date: str | None = None
     held_by: str | None = None
@@ -16,7 +14,7 @@ class Record(APIResult):
         return self.__dict__
 
 
-class RecordSearchResults(APIResponse):
+class RecordSearchResults(APISearchResponse):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    results: list[Record] = []
+    results: list[RecordSearchResult] = []

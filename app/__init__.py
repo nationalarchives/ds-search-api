@@ -15,10 +15,10 @@ def create_app():
     from .records import routes as record_routes
 
     app.include_router(
-        record_routes.router, prefix=f"{base_uri}/records", tags=["records"]
+        record_routes.router, prefix=f"{base_uri}/records", tags=["Records"]
     )
     app.include_router(
-        article_routes.router, prefix=f"{base_uri}/articles", tags=["articles"]
+        article_routes.router, prefix=f"{base_uri}/articles", tags=["Articles"]
     )
 
     return app
