@@ -10,7 +10,7 @@ from app.records.schemas import (
 )
 from config import Config
 
-from .lib import RosettaResponseParser
+from .lib import RosettaResponseParser, RosettaSourceParser
 
 
 class RosettaRecords(GetAPI):
@@ -32,6 +32,7 @@ class RosettaRecordsSearch(RosettaRecords):
         offset = (page - 1) * self.results_per_page
         self.add_parameter("size", self.results_per_page)
         self.add_parameter("from", offset)
+        self.add_parameter("includeSource", True)
         url = self.build_url()
         print(url)
         raw_results = self.execute(url)
@@ -40,24 +41,17 @@ class RosettaRecordsSearch(RosettaRecords):
     def parse_results(self, raw_results, page):
         response = RecordSearchResults()
         for r in raw_results["metadata"]:
+            parsed_data = RosettaSourceParser(r["_source"])
             record = RecordSearchResult()
-            record.id = r["id"]
+            record.id = parsed_data.id()
             details = r["detail"]["@template"]["details"]
-            record.ref = (
-                details["referenceNumber"]
-                if "referenceNumber" in details
-                else None
-            )
+            record.ref = parsed_data.reference_number()
             record.title = (
                 details["summaryTitle"] if "summaryTitle" in details else None
             )
-            record.description = (
-                details["description"][0] if "description" in details else None
-            )
-            record.covering_date = (
-                details["dateCovering"] if "dateCovering" in details else None
-            )
-            record.held_by = details["heldBy"] if "heldBy" in details else None
+            record.description = parsed_data.description()
+            record.date = parsed_data.date()
+            record.held_by = parsed_data.held_by()
             # if highlight and "highLight" in r:
             #     if "@template.details.summaryTitle" in r["highLight"]:
             #         record.title = r["highLight"]["@template.details.summaryTitle"][0]
@@ -89,47 +83,25 @@ class RosettaRecordDetails(RosettaRecords):
 
     def parse_results(self, raw_results):
         parsed_data = RosettaResponseParser(raw_results)
-        # dump = {
-        #     "actual_type": parsed_data.actual_type(),
-        #     "type": parsed_data.type(),
-        #     "title": parsed_data.title(),
-        #     "name": parsed_data.name(),
-        #     "names": parsed_data.names(),
-        #     "date": parsed_data.date(),
-        #     "lifespan": parsed_data.lifespan(),
-        #     "date_range": parsed_data.date_range(),
-        #     "places": parsed_data.places(),
-        #     "gender": parsed_data.gender(),
-        #     "contact_info": parsed_data.contact_info(),
-        #     "description": parsed_data.description(),
-        #     "functions": parsed_data.functions(),
-        #     "history": parsed_data.history(),
-        #     "biography": parsed_data.biography(),
-        #     "identifier": parsed_data.identifier(),
-        #     "reference_number": parsed_data.reference_number(),
-        #     # 'agents': parsed_data.agents()
-        # }
         if parsed_data.type() == "record":
             # TODO: ExternalRecord
             record = Record(parsed_data.id())
-            record.ref = ""
+            record.ref = parsed_data.identifier()
             record.title = parsed_data.title()
             record.date = parsed_data.date_range()
             record.is_digitised = parsed_data.is_digitised()
-            # record.dump = dump
+            record.held_by = parsed_data.held_by()
             return record.toJSON()
         if (
             parsed_data.type() == "archive"
             or parsed_data.type() == "repository"
         ):
-            # return raw_results
             record = RecordArchive(parsed_data.id())
             record.name = parsed_data.title()
             record.archon = parsed_data.reference_number()
             record.places = parsed_data.places()
             record.contact_info = parsed_data.contact_info()
             record.agents = parsed_data.agents()
-            # record.dump = dump
             return record.toJSON()
         if parsed_data.type() == "agent":
             if parsed_data.actual_type() == "person":
@@ -149,6 +121,5 @@ class RosettaRecordDetails(RosettaRecords):
             record.places = parsed_data.places()
             record.identifier = parsed_data.identifier()
             record.history = parsed_data.functions()
-            # record.dump = dump
             return record.toJSON()
         return {}

@@ -2,9 +2,14 @@ from pyquery import PyQuery
 
 
 class RosettaResponseParser:
-    def __init__(self, rosetta_data):
-        self.data = rosetta_data
-        self.source = self.data["metadata"][0]["_source"]
+    def __new__(cls, rosetta_data: dict, source_item: int = 0):
+        rosetta_data_source = rosetta_data["metadata"][source_item]["_source"]
+        return RosettaSourceParser(rosetta_data_source)
+
+
+class RosettaSourceParser:
+    def __init__(self, rosetta_data_source):
+        self.source = rosetta_data_source
 
     def strip_outside_tags(self, markup, query):
         document = PyQuery(markup)
@@ -51,10 +56,17 @@ class RosettaResponseParser:
                 None,
             ):
                 return primary_title
+        if summary_title := self.summary_title():
+            return summary_title
         if name := self.name():
             return name
         if description := self.description():
             return description
+        return ""
+
+    def summary_title(self) -> str:
+        if "summary" in self.source and "title" in self.source["summary"]:
+            return self.source["summary"]["title"]
         return ""
 
     def name(self) -> str:
@@ -64,8 +76,8 @@ class RosettaResponseParser:
         return ""
 
     def names(self) -> dict:
-        names = {}
         if "name" in self.source:
+            names = {}
             if name_data := next(
                 (
                     item
@@ -96,8 +108,8 @@ class RosettaResponseParser:
                 ),
                 None,
             ):
-                names["Alternative name(s)"] = aka
-        return names
+                names["alternative_names"] = aka
+        return {}
 
     def date(self) -> str:
         return self.lifespan() or self.date_range() or ""
@@ -146,6 +158,24 @@ class RosettaResponseParser:
             if "end" in self.source and "date" in self.source["end"]
             else ""
         )
+        if date_from or date_to:
+            return f"{date_from}–{date_to}"
+        if (
+            "origination" in self.source
+            and "date" in self.source["origination"]
+        ):
+            if value := self.source["origination"]["date"]["value"]:
+                return value
+            date_from = (
+                self.source["origination"]["date"]["from"]
+                if "from" in self.source["origination"]["date"]
+                else ""
+            )
+            date_to = (
+                self.source["origination"]["date"]["to"]
+                if "to" in self.source["origination"]["date"]
+                else ""
+            )
         if date_from or date_to:
             return f"{date_from}–{date_to}"
         return ""
@@ -325,6 +355,16 @@ class RosettaResponseParser:
 
     def identifier(self) -> str:
         if "identifier" in self.source:
+            if identifier := next(
+                (
+                    item["value"]
+                    for item in self.source["identifier"]
+                    if "primary" in item and item["primary"] and "value" in item
+                ),
+                None,
+            ):
+                return identifier
+
             primary_identifier = next(
                 (
                     item["value"]
@@ -415,3 +455,21 @@ class RosettaResponseParser:
                         if archon_number == "P":
                             agents["persons"].append(agent_data)
         return agents
+
+    def held_by(self) -> dict:
+        if "repository" in self.source:
+            id = ""
+            name = ""
+            if (
+                "name" in self.source["repository"]
+                and "value" in self.source["repository"]["name"]
+            ):
+                name = self.source["repository"]["name"]["value"]
+            if (
+                "@admin" in self.source["repository"]
+                and "id" in self.source["repository"]["@admin"]
+            ):
+                id = self.source["repository"]["@admin"]["id"]
+            if id and name:
+                return {"id": id, "name": name}
+        return {}

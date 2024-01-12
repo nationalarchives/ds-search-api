@@ -1,1 +1,1 @@
-from .response_parser import RosettaResponseParser
+from .response_parser import RosettaResponseParser, RosettaSourceParser

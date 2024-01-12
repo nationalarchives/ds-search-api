@@ -20,6 +20,7 @@ class Record(Details):
     title: str = ""
     date: str = ""
     is_digitised: bool | None = None
+    held_by: dict | None = None
 
     def __init__(self, id: str):
         super().__init__(id)
@@ -30,7 +31,7 @@ class ExternalRecord(Details):
     ref: str | None = None
     title: str = ""
     covering_date: str | None = None
-    held_by: str | None = None
+    held_by: dict | None = None
 
     def __init__(self, id: str):
         super().__init__(id)

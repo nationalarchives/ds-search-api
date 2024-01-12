@@ -4,7 +4,7 @@ from pydantic import ConfigDict
 
 class RecordSearchResult(APISearchResult):
     ref: str | None = None
-    covering_date: str | None = None
+    date: str | None = None
     held_by: str | None = None
 
     def __str__(self):
