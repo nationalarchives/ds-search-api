@@ -20,6 +20,7 @@ class RosettaRecordsSearch(RosettaRecords):
     def __init__(self):
         super().__init__()
         self.api_path = "/search"
+        self.add_parameter("includeSource", True)
 
     def add_query(self, query_string: str) -> None:
         self.add_parameter("q", query_string)
@@ -30,13 +31,11 @@ class RosettaRecordsSearch(RosettaRecords):
         offset = (page - 1) * self.results_per_page
         self.add_parameter("size", self.results_per_page)
         self.add_parameter("from", offset)
-        self.add_parameter("includeSource", True)
         url = self.build_url()
-        print(url)
         raw_results = self.execute(url)
         return self.parse_results(raw_results, page, url)
 
-    def parse_results(self, raw_results, page, source_url):
+    def parse_results(self, raw_results, page, source_url) -> dict:
         response = RecordSearchResults()
         response.source_url = source_url
         for r in raw_results["metadata"]:
@@ -81,7 +80,6 @@ class RosettaRecordDetails(RosettaRecords):
         self.add_parameter("id", id)
         self.add_parameter("includeSource", True)
         url = self.build_url()
-        print(url)
         raw_results = self.execute(url)
         return self.parse_results(raw_results, url)
 

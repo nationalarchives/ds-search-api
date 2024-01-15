@@ -29,10 +29,8 @@ class WebsiteArticles(WagtailAPI):
         # self.add_parameter("fields", "search_description,teaser_image_jpg")  # TODO: Not all pages have a teaser image
         self.add_parameter("fields", "search_description")
         url = self.build_url()
-        print(f"API request URL: {url}")
         raw_results = self.execute(url)
         response = ArticleSearchResults()
-        response.source_url = url
         for a in raw_results["items"]:
             article = Article()
             article.title = a["title"]
@@ -52,6 +50,7 @@ class WebsiteArticles(WagtailAPI):
         response.count = raw_results["meta"]["total_count"]
         response.results_per_page = self.results_per_page
         response.page = page
+        response.source_url = url
         return response.toJSON()
 
 
