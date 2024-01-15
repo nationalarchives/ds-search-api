@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 def create_app():
     config = Config()
-    app = FastAPI(log_level=config.LOG_LEVEL)
+    app = FastAPI(title="ETNA Search API", log_level=config.LOG_LEVEL)
     base_uri = "/api/v1"
 
     @app.get("/healthcheck/live/", include_in_schema=False)

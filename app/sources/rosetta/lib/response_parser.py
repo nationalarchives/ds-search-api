@@ -237,18 +237,18 @@ class RosettaSourceParser:
                 and "label" in place["description"]
                 and "value" in place["description"]["label"]
             ]
-        return []
+        return ""
 
-    def opening_hours(self):
+    def place_opening_times(self) -> str:
         if "place" in self.source:
             for place in self.source["place"]:
                 if "description" in place and "value" in place["description"]:
                     document = PyQuery(place["description"]["value"])
-                    if opening_hours := document("span.openinghours").text():
-                        return opening_hours
-        return []
+                    if opening_times := document("span.openinghours").text():
+                        return opening_times
+        return ""
 
-    def disabled_access(self):
+    def place_disabled_access(self) -> str:
         if "place" in self.source:
             for place in self.source["place"]:
                 if "description" in place and "value" in place["description"]:
@@ -257,15 +257,33 @@ class RosettaSourceParser:
                         "span.disabledaccess"
                     ).text():
                         return disabled_access
-        return []
+        return ""
 
-    def place_comments(self):
+    def place_comments(self) -> str:
         if "place" in self.source:
             for place in self.source["place"]:
                 if "description" in place and "value" in place["description"]:
                     document = PyQuery(place["description"]["value"])
                     if comments := document("span.comments").text():
                         return comments
+        return ""
+
+    def place_fee(self) -> str:
+        if "place" in self.source:
+            for place in self.source["place"]:
+                if "description" in place and "value" in place["description"]:
+                    document = PyQuery(place["description"]["value"])
+                    if fee := document("span.fee").text():
+                        return fee
+        return ""
+
+    def place_appointment(self) -> str:
+        if "place" in self.source:
+            for place in self.source["place"]:
+                if "description" in place and "value" in place["description"]:
+                    document = PyQuery(place["description"]["value"])
+                    if appointment := document("span.appointment").text():
+                        return appointment
         return []
 
     def gender(self) -> str:

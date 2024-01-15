@@ -61,9 +61,11 @@ class RecordArchive(Details):
     type: str = "archive"
     name: str = ""
     archon: str = ""
-    opening_hours: str = ""
+    opening_times: str = ""
     disabled_access: str = ""
-    place_information: str = ""
+    information: str = ""
+    fee: str = ""
+    appointment: str = ""
     contact_info: dict = {}
     places: list[str] = []
     agents: dict = {}
