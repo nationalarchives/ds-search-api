@@ -73,7 +73,7 @@ class RosettaSourceParser:
         names = self.names()
         if "name" in names:
             return names["name"]
-        return ""
+        return self.title() or ""
 
     def names(self) -> dict:
         names = {}
@@ -250,7 +250,9 @@ class RosettaSourceParser:
             ):
                 document = PyQuery(ephemera)
                 return {
-                    "address_line_1": document("addressline1").text(),
+                    "address_line_1": document("addressline1")
+                    .text()
+                    .replace("<br /><br />", ", "),
                     "town": document("addresstown").text(),
                     "postcode": document("postcode").text(),
                     "country": document("addresscountry").text(),

@@ -116,7 +116,7 @@ class RosettaRecordDetails(RosettaRecords):
                 record = RecordCreatorPerson(parsed_data.id())
                 record.name = parsed_data.name()
                 record.name_parts = parsed_data.names()
-                record.date = parsed_data.lifespan()
+                record.date = parsed_data.date()
                 record.gender = parsed_data.gender()
                 record.identifier = parsed_data.identifier()
                 record.functions = parsed_data.functions()
