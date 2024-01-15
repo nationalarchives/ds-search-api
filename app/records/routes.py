@@ -118,10 +118,10 @@ async def archives_filters() -> list[Filter]:
     return filters
 
 
-@router.get("/{item_id}/")
+@router.get("/{id}/")
 async def item(
-    item_id: str,
+    id: str,
 ):  # ) -> Record | RecordCreator | RecordArchive:
     rosetta_api = RosettaRecordDetails()
-    result = rosetta_api.get_result(item_id)
+    result = rosetta_api.get_result(id)
     return result

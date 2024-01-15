@@ -23,9 +23,10 @@ class GetAPI(BaseAPI):
     def invalidator(self) -> str:
         return uuid.uuid4()
 
-    def build_query_string(self) -> str:
+    def build_query_string(self, add_invalidator=False) -> str:
         params = self.params
-        params["invalidator"] = self.invalidator()
+        if add_invalidator:
+            params["invalidator"] = self.invalidator()
         return "?" + urllib.parse.urlencode(params) if len(params) else ""
 
     def build_url(self) -> str:

@@ -13,8 +13,7 @@ from .lib import RosettaResponseParser, RosettaSourceParser
 
 
 class RosettaRecords(GetAPI):
-    def __init__(self):
-        self.api_base_url = Config().ROSETTA_API_URL
+    api_base_url = Config().ROSETTA_API_URL
 
 
 class RosettaRecordsSearch(RosettaRecords):
@@ -35,10 +34,11 @@ class RosettaRecordsSearch(RosettaRecords):
         url = self.build_url()
         print(url)
         raw_results = self.execute(url)
-        return self.parse_results(raw_results, page)
+        return self.parse_results(raw_results, page, url)
 
-    def parse_results(self, raw_results, page):
+    def parse_results(self, raw_results, page, source_url):
         response = RecordSearchResults()
+        response.source_url = source_url
         for r in raw_results["metadata"]:
             parsed_data = RosettaSourceParser(r["_source"])
             record = RecordSearchResult()
@@ -83,9 +83,9 @@ class RosettaRecordDetails(RosettaRecords):
         url = self.build_url()
         print(url)
         raw_results = self.execute(url)
-        return self.parse_results(raw_results)
+        return self.parse_results(raw_results, url)
 
-    def parse_results(self, raw_results):
+    def parse_results(self, raw_results, source_url):
         parsed_data = RosettaResponseParser(raw_results)
         if parsed_data.type() == "record":
             record = Record(parsed_data.id())
@@ -99,6 +99,7 @@ class RosettaRecordDetails(RosettaRecords):
             record.closure_status = parsed_data.closure_status()
             record.languages = parsed_data.languages()
             record.access_condition = parsed_data.access_condition()
+            record.source_url = source_url
             return record.toJSON()
         if (
             parsed_data.type() == "archive"
@@ -110,6 +111,7 @@ class RosettaRecordDetails(RosettaRecords):
             record.places = parsed_data.places()
             record.contact_info = parsed_data.contact_info()
             record.agents = parsed_data.agents()
+            record.source_url = source_url
             return record.toJSON()
         if parsed_data.type() == "agent":
             if parsed_data.actual_type() == "person":
@@ -122,6 +124,7 @@ class RosettaRecordDetails(RosettaRecords):
                 record.functions = parsed_data.functions()
                 record.history = parsed_data.functions()
                 record.biography = parsed_data.biography()
+                record.source_url = source_url
                 return record.toJSON()
             record = RecordCreator(parsed_data.id())
             record.name = parsed_data.title()
@@ -129,5 +132,6 @@ class RosettaRecordDetails(RosettaRecords):
             record.places = parsed_data.places()
             record.identifier = parsed_data.identifier()
             record.history = parsed_data.functions()
+            record.source_url = source_url
             return record.toJSON()
         return {}

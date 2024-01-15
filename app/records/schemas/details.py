@@ -5,6 +5,7 @@ class Details(BaseModel):
     type: str
     id: str = ""
     # dump: dict = {}  # TEMP
+    source_url: str = ""
 
     def __init__(self, id: str):
         super().__init__()

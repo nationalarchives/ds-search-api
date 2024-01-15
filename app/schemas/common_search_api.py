@@ -23,6 +23,7 @@ class APISearchResponse(BaseModel):
     result_range_max: int = 0
     results_per_page: int = 0
     results: list[APISearchResult] = []
+    source_url: str = ""
 
     def get_pages(self):
         return (
