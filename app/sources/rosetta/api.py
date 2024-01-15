@@ -88,6 +88,7 @@ class RosettaRecordDetails(RosettaRecords):
         if parsed_data.type() == "record":
             record = Record(parsed_data.id())
             record.ref = parsed_data.identifier()
+            record.former_ref = parsed_data.former_identifier()
             record.title = parsed_data.title()
             record.description = parsed_data.description()
             record.date = parsed_data.date_range()

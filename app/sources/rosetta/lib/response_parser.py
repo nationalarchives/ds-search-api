@@ -11,12 +11,15 @@ class RosettaSourceParser:
     def __init__(self, rosetta_data_source):
         self.source = rosetta_data_source
 
-    def strip_outside_tags(self, markup, query):
-        document = PyQuery(markup)
-        return str(document(query).contents().eq(0))
-
     def strip_scope_and_content(self, markup):
-        return self.strip_outside_tags(markup, "span.scopecontent")
+        document = PyQuery(markup)
+        return str(document("span.scopecontent").contents().eq(0))
+
+    def strip_wrapper_and_split_span(self, markup):
+        document = PyQuery(markup)
+        spans = document("span.wrapper").find("span.emph")
+        contents = [span.text for span in spans if span.text is not None]
+        return "<br>".join(contents)
 
     def type(self) -> str:
         if "@datatype" in self.source and "base" in self.source["@datatype"]:
@@ -275,9 +278,14 @@ class RosettaSourceParser:
                 None,
             ):
                 if "value" in description:
-                    return self.strip_scope_and_content(
-                        description["value"]
-                    )  # TODO: Breaks on C17371160
+                    # TODO: Breaks on C17371160
+                    return (
+                        self.strip_scope_and_content(description["value"])
+                        or self.strip_wrapper_and_split_span(
+                            description["value"]
+                        )
+                        or description["value"]
+                    )
                 elif (
                     "ephemera" in description
                     and "value" in description["ephemera"]
@@ -404,6 +412,21 @@ class RosettaSourceParser:
                 if former_identifier
                 else primary_identifier
             )
+        return ""
+
+    def former_identifier(self) -> str:
+        if "identifier" in self.source:
+            if identifier := next(
+                (
+                    item["value"]
+                    for item in self.source["identifier"]
+                    if "type" in item
+                    and item["type"] == "former reference (Department)"
+                    and "value" in item
+                ),
+                None,
+            ):
+                return identifier
         return ""
 
     def reference_number(self) -> str:

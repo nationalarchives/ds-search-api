@@ -18,6 +18,7 @@ class Details(BaseModel):
 class Record(Details):
     type: str = "record"
     ref: str | None = None
+    former_ref: str | None = None
     title: str = ""
     description: str = ""
     date: str = ""
