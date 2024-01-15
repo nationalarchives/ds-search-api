@@ -61,9 +61,13 @@ class RecordArchive(Details):
     type: str = "archive"
     name: str = ""
     archon: str = ""
+    opening_hours: str = ""
+    disabled_access: str = ""
+    place_information: str = ""
+    contact_info: dict = {}
     places: list[str] = []
     agents: dict = {}
-    contact_info: dict = {}
+    manifestations: list[dict] = []
 
     def __init__(self, id: str):
         super().__init__(id)

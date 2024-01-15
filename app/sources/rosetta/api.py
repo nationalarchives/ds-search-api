@@ -107,9 +107,13 @@ class RosettaRecordDetails(RosettaRecords):
             record = RecordArchive(parsed_data.id())
             record.name = parsed_data.title()
             record.archon = parsed_data.reference_number()
+            record.opening_hours = parsed_data.opening_hours()
+            record.disabled_access = parsed_data.disabled_access()
+            record.place_information = parsed_data.place_comments()
             record.places = parsed_data.places()
             record.contact_info = parsed_data.contact_info()
             record.agents = parsed_data.agents()
+            record.manifestations = parsed_data.manifestations()
             record.source_url = source_url
             return record.toJSON()
         if parsed_data.type() == "agent":

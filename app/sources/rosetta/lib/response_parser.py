@@ -228,6 +228,46 @@ class RosettaSourceParser:
                 places.append(place_address)
         return places
 
+    def place_descriptions(self) -> list[str]:
+        if "place" in self.source:
+            return [
+                place["description"]["label"]["value"]
+                for place in self.source["place"]
+                if "description" in place
+                and "label" in place["description"]
+                and "value" in place["description"]["label"]
+            ]
+        return []
+
+    def opening_hours(self):
+        if "place" in self.source:
+            for place in self.source["place"]:
+                if "description" in place and "value" in place["description"]:
+                    document = PyQuery(place["description"]["value"])
+                    if opening_hours := document("span.openinghours").text():
+                        return opening_hours
+        return []
+
+    def disabled_access(self):
+        if "place" in self.source:
+            for place in self.source["place"]:
+                if "description" in place and "value" in place["description"]:
+                    document = PyQuery(place["description"]["value"])
+                    if disabled_access := document(
+                        "span.disabledaccess"
+                    ).text():
+                        return disabled_access
+        return []
+
+    def place_comments(self):
+        if "place" in self.source:
+            for place in self.source["place"]:
+                if "description" in place and "value" in place["description"]:
+                    document = PyQuery(place["description"]["value"])
+                    if comments := document("span.comments").text():
+                        return comments
+        return []
+
     def gender(self) -> str:
         if "gender" in self.source:
             return (
@@ -545,4 +585,36 @@ class RosettaSourceParser:
                 for language in self.source["language"]
                 if "value" in language
             ]
+        return []
+
+    def manifestations(self) -> list[dict]:
+        if "manifestations" in self.source:
+            return sorted(
+                [
+                    {
+                        "title": ", ".join(
+                            [
+                                title["value"]
+                                for title in item["title"]
+                                if "value" in title
+                            ]
+                        ),
+                        "url": item["url"],
+                        "nra": next(
+                            (
+                                identifier["value"]
+                                for identifier in item["identifier"]
+                                if "type" in identifier
+                                and identifier["type"]
+                                == "NRA catalogue reference (2nd part)"
+                            ),
+                            None,
+                        )
+                        or None,
+                    }
+                    for item in self.source["manifestations"]
+                    if "title" in item and "url" in item
+                ],
+                key=lambda x: x["title"],
+            )
         return []
