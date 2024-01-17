@@ -605,6 +605,19 @@ class RosettaSourceParser:
             ]
         return []
 
+    def accumulation_dates(self) -> list[str]:
+        if "accruals" in self.source:
+            if (
+                "date" in self.source["accruals"]
+                and "value" in self.source["accruals"]["date"]
+            ):
+                document = PyQuery(self.source["accruals"]["date"]["value"])
+                spans = document("span.accessionyears").find(
+                    "span.accessionyear"
+                )
+                return [span.text for span in spans if span.text is not None]
+        return []
+
     def manifestations(self) -> list[dict]:
         if "manifestations" in self.source:
             return sorted(

@@ -68,6 +68,7 @@ class RecordArchive(Details):
     appointment: str = ""
     contact_info: dict = {}
     places: list[str] = []
+    accumulation_dates: list[str] = []
     agents: dict = {}
     manifestations: list[dict] = []
 

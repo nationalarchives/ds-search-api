@@ -72,10 +72,10 @@ async def external(
     return results
 
 
-@router.get("/external/filters/")
-async def external_filters() -> list[Filter]:
-    filters = []
-    return filters
+# @router.get("/external/filters/")
+# async def external_filters() -> list[Filter]:
+#     filters = []
+#     return filters
 
 
 @router.get("/creators/")
@@ -91,10 +91,10 @@ async def creators(
     return results
 
 
-@router.get("/creators/filters/")
-async def creators_filters() -> list[Filter]:
-    filters = []
-    return filters
+# @router.get("/creators/filters/")
+# async def creators_filters() -> list[Filter]:
+#     filters = []
+#     return filters
 
 
 @router.get("/archives/")
@@ -110,10 +110,10 @@ async def archives(
     return results
 
 
-@router.get("/archives/filters/")
-async def archives_filters() -> list[Filter]:
-    filters = []
-    return filters
+# @router.get("/archives/filters/")
+# async def archives_filters() -> list[Filter]:
+#     filters = []
+#     return filters
 
 
 @router.get("/{id}/")

@@ -116,6 +116,7 @@ class RosettaRecordDetails(RosettaRecords):
             record.contact_info = parsed_data.contact_info()
             record.agents = parsed_data.agents()
             record.manifestations = parsed_data.manifestations()
+            record.accumulation_dates = parsed_data.accumulation_dates()
             record.source_url = source_url
             return record.toJSON()
         if parsed_data.type() == "agent":
