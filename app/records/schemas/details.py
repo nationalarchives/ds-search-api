@@ -60,7 +60,7 @@ class RecordCreatorPerson(RecordCreator):
 class RecordArchive(Details):
     type: str = "archive"
     name: str = ""
-    archon: str = ""
+    archon_code: str = ""
     opening_times: str = ""
     disabled_access: str = ""
     information: str = ""

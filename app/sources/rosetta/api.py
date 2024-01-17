@@ -106,7 +106,7 @@ class RosettaRecordDetails(RosettaRecords):
         ):
             record = RecordArchive(parsed_data.id())
             record.name = parsed_data.title()
-            record.archon = parsed_data.reference_number()
+            record.archon_code = parsed_data.reference_number()
             record.opening_times = parsed_data.place_opening_times()
             record.disabled_access = parsed_data.place_disabled_access()
             record.information = parsed_data.place_comments()
