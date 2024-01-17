@@ -1,5 +1,6 @@
 from app.lib.api import GetAPI
 from app.records.schemas import (
+    Aggregation,
     Record,
     RecordArchive,
     RecordCreator,
@@ -96,8 +97,42 @@ class RosettaRecordDetails(RosettaRecords):
             record.held_by = parsed_data.held_by()
             record.legal_status = parsed_data.legal_status()
             record.closure_status = parsed_data.closure_status()
-            record.languages = parsed_data.languages()
             record.access_condition = parsed_data.access_condition()
+            record.languages = parsed_data.languages()
+            record.hierarchy = (
+                parsed_data.hierarchies()[0]
+                if len(parsed_data.hierarchies())
+                else []
+            )
+            record.source_url = source_url
+            return record.toJSON()
+        if parsed_data.type() == "aggregation":
+            record = Aggregation(parsed_data.id())
+            record.iaid = parsed_data.iaid()
+            record.title = parsed_data.title()
+            record.description = parsed_data.description()
+            record.physical_description = parsed_data.physical_description()
+            record.administrative_background = (
+                parsed_data.administrative_background()
+            )
+            record.arrangement = parsed_data.arrangement()
+            record.date = parsed_data.date_range()
+            record.is_digitised = parsed_data.is_digitised()
+            record.held_by = parsed_data.held_by()
+            record.creators = parsed_data.creators()
+            record.acquisition = parsed_data.acquisition()
+            record.unpublished_finding_aids = (
+                parsed_data.unpublished_finding_aids()
+            )
+            record.legal_status = parsed_data.legal_status()
+            record.closure_status = parsed_data.closure_status()
+            record.access_condition = parsed_data.access_condition()
+            record.languages = parsed_data.languages()
+            record.hierarchy = (
+                parsed_data.hierarchies()[0]
+                if len(parsed_data.hierarchies())
+                else []
+            )
             record.source_url = source_url
             return record.toJSON()
         if (
@@ -140,4 +175,6 @@ class RosettaRecordDetails(RosettaRecords):
             record.history = parsed_data.functions()
             record.source_url = source_url
             return record.toJSON()
-        return {}
+        raise Exception(
+            f"Respone type '{parsed_data.type()}' is not recognised"
+        )

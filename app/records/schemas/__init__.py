@@ -1,4 +1,5 @@
 from .details import (
+    Aggregation,
     Details,
     Record,
     RecordArchive,

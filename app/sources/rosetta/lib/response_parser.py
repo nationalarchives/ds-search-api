@@ -1,4 +1,30 @@
+from enum import Enum
+
 from pyquery import PyQuery
+
+hierarchy_level_names = {
+    1: "Department",
+    2: "Division",
+    3: "Series",
+    4: "Sub-series",
+    5: "Sub-sub-series",
+    6: "Piece",
+    7: "Item",
+}
+
+non_tna_hierarchy_level_names = {
+    1: "Fonds",
+    2: "Sub-fonds",
+    3: "Sub-sub-fonds",
+    4: "Sub-sub-sub-fonds",
+    5: "Series",
+    6: "Sub-series",
+    7: "Sub-sub-series",
+    8: "Sub-sub-sub-series",
+    9: "File",
+    10: "Item",
+    11: "Sub-item",
+}
 
 
 class RosettaResponseParser:
@@ -13,7 +39,7 @@ class RosettaSourceParser:
 
     def strip_scope_and_content(self, markup):
         document = PyQuery(markup)
-        return str(document("span.scopecontent").contents().eq(0))
+        return str(document("span.scopecontent").contents())
 
     def strip_wrapper_and_split_span(self, markup):
         document = PyQuery(markup)
@@ -35,7 +61,22 @@ class RosettaSourceParser:
         if "@admin" in self.source:
             if "id" in self.source["@admin"]:
                 return self.source["@admin"]["id"]
-        return "UNKNOWN"
+        return ""
+
+    def iaid(self) -> str:
+        if "identifier" in self.source:
+            if iaid := next(
+                (
+                    item["value"]
+                    for item in self.source["identifier"]
+                    if "type" in item
+                    and item["type"] == "iaid"
+                    and "value" in item
+                ),
+                None,
+            ):
+                return iaid
+        return ""
 
     def uuid(self) -> str:
         if "@admin" in self.source:
@@ -48,7 +89,19 @@ class RosettaSourceParser:
             return self.source["digitised"]
         return False
 
+    def is_tna(self) -> bool:
+        if "@datatype" in self.source and "group" in self.source["@datatype"]:
+            groups = [
+                group["value"]
+                for group in self.source["@datatype"]["group"]
+                if "value" in group
+            ]
+            return "tna" in groups or "nonTna" not in groups
+        return self.is_digitised() or False
+
     def title(self) -> str:
+        if summary_title := self.summary_title():
+            return summary_title
         if "title" in self.source:
             if primary_title := next(
                 (
@@ -59,8 +112,6 @@ class RosettaSourceParser:
                 None,
             ):
                 return primary_title
-        if summary_title := self.summary_title():
-            return summary_title
         if name := self.name():
             return name
         if description := self.description():
@@ -68,9 +119,11 @@ class RosettaSourceParser:
         return ""
 
     def summary_title(self) -> str:
-        if "summary" in self.source and "title" in self.source["summary"]:
-            return self.source["summary"]["title"]
-        return ""
+        return (
+            self.source["summary"]["title"]
+            if "summary" in self.source and "title" in self.source["summary"]
+            else ""
+        )
 
     def name(self) -> str:
         names = self.names()
@@ -365,6 +418,25 @@ class RosettaSourceParser:
                 return default_description
         return ""
 
+    def administrative_background(self) -> str:
+        if (
+            "origination" in self.source
+            and "description" in self.source["origination"]
+        ):
+            if administrative_background := next(
+                (
+                    item["value"]
+                    for item in self.source["origination"]["description"]
+                    if "value" in item
+                    and "type" in item
+                    and item["type"] == "administrative background"
+                ),
+                None,
+            ):
+                document = PyQuery(administrative_background)
+                return str(document("span.bioghist").contents().eq(0))
+        return ""
+
     def functions(self) -> str:
         if "description" in self.source:
             functions = next(
@@ -383,6 +455,14 @@ class RosettaSourceParser:
                         return doc_value
                 return functions["value"]
         return ""
+
+    def physical_description(self) -> str:
+        return (
+            self.source["measurements"]["display"]
+            if "measurements" in self.source
+            and "display" in self.source["measurements"]
+            else ""
+        )
 
     def epithet(self) -> str:
         if "description" in self.source:
@@ -576,6 +656,15 @@ class RosettaSourceParser:
             else ""
         )
 
+    def arrangement(self) -> str:
+        if (
+            "arrangement" in self.source
+            and "value" in self.source["arrangement"]
+        ):
+            document = PyQuery(self.source["arrangement"]["value"])
+            return str(document("span.arrangement").contents())
+        return ""
+
     def closure_status(self) -> str:
         return (
             self.source["availability"]["closure"]["label"]["value"]
@@ -595,6 +684,96 @@ class RosettaSourceParser:
             and "value" in self.source["availability"]["access"]["condition"]
             else ""
         )
+
+    def creators(self) -> list[str]:
+        creators = []
+        if (
+            "origination" in self.source
+            and "creator" in self.source["origination"]
+        ):
+            for creator in self.source["origination"]["creator"]:
+                name_details = (
+                    creator["name"][0]
+                    if "name" in creator and len(creator["name"])
+                    else None
+                )
+                first_names = (
+                    "".join(name_details["first"])
+                    if name_details and "first" in name_details
+                    else ""
+                )
+                last_name = (
+                    name_details["last"]
+                    if name_details and "last" in name_details
+                    else ""
+                )
+                name = f"{first_names} {last_name}".strip()
+                title = (
+                    name_details["title"]
+                    if name_details and "title" in name_details
+                    else ""
+                )
+                date_from = (
+                    creator["date"]["from"]
+                    if "date" in creator and "from" in creator["date"]
+                    else ""
+                )
+                date_to = (
+                    creator["date"]["to"]
+                    if "date" in creator and "to" in creator["date"]
+                    else ""
+                )
+                creators.append(
+                    {
+                        "name": name,
+                        "title": title,
+                        "date": f"{date_from}–{date_to}"
+                        if date_from or date_to
+                        else "",
+                    }
+                )
+        return creators
+
+    def acquisition(self) -> list[str]:
+        acquisition = []
+        if "acquisition" in self.source:
+            for acquisitor in self.source["acquisition"]:
+                title = (
+                    acquisitor["agent"]["name"][0]["value"]
+                    if "agent" in acquisitor
+                    and "name" in acquisitor["agent"]
+                    and len(acquisitor["agent"]["name"])
+                    and "value" in acquisitor["agent"]["name"][0]
+                    else (
+                        acquisitor["description"]["value"]
+                        if "description" in acquisitor
+                        and "value" in acquisitor["description"]
+                        else ""
+                    )
+                )
+                date_from = (
+                    acquisitor["agent"]["date"]["from"]
+                    if "agent" in acquisitor
+                    and "date" in acquisitor["agent"]
+                    and "from" in acquisitor["agent"]["date"]
+                    else ""
+                )
+                date_to = (
+                    acquisitor["agent"]["date"]["to"]
+                    if "agent" in acquisitor
+                    and "date" in acquisitor["agent"]
+                    and "to" in acquisitor["agent"]["date"]
+                    else ""
+                )
+                acquisition.append(
+                    {
+                        "title": title,
+                        "date": f"{date_from}–{date_to}"
+                        if date_from or date_to
+                        else "",
+                    }
+                )
+        return acquisition
 
     def languages(self) -> list[str]:
         if "language" in self.source:
@@ -649,3 +828,71 @@ class RosettaSourceParser:
                 key=lambda x: x["title"],
             )
         return []
+
+    def hierarchies(self) -> list[dict]:
+        hierarchies = []
+        if "@hierarchy" in self.source:
+            for hierarchy in self.source["@hierarchy"]:
+                hierarchy_levels = []
+                for level in hierarchy:
+                    id = (
+                        level["@admin"]["id"]
+                        if "@admin" in level and "id" in level["@admin"]
+                        else ""
+                    )
+                    title = (
+                        level["summary"]["title"]
+                        if "summary" in level and "title" in level["summary"]
+                        else ""
+                    )
+                    level_code = (
+                        level["level"]["code"]
+                        if "level" in level and "code" in level["level"]
+                        else ""
+                    )
+                    hierarchy_level = {
+                        "id": id,
+                        "title": title,
+                        "level_code": level_code or "",
+                    }
+                    if level_code:
+                        level_names = (
+                            hierarchy_level_names
+                            if self.is_tna()
+                            else non_tna_hierarchy_level_names
+                        )
+                        hierarchy_level["level_name"] = (
+                            level_names[level_code]
+                            if level_code in level_names
+                            else ""
+                        )
+                    if "identifier" in level:
+                        if identifier := next(
+                            (
+                                identifier["value"]
+                                for identifier in level["identifier"]
+                                if "value" in identifier
+                                and "primary" in identifier
+                                and identifier["primary"]
+                            ),
+                            None,
+                        ):
+                            hierarchy_level["identifier"] = identifier
+                    hierarchy_levels.append(hierarchy_level)
+                hierarchies.append(hierarchy_levels)
+        return hierarchies
+
+    def unpublished_finding_aids(self) -> str:
+        if "note" in self.source:
+            if unpublished_finding_aids := next(
+                (
+                    item["value"]
+                    for item in self.source["note"]
+                    if "value" in item
+                    and "type" in item
+                    and item["type"] == "unpublished finding aids"
+                ),
+                None,
+            ):
+                return unpublished_finding_aids
+        return ""
