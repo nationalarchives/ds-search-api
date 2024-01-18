@@ -17,16 +17,16 @@ class Details(BaseModel):
 
 class Record(Details):
     type: str = "record"
-    ref: str = ""
-    former_ref: str = ""
-    title: str = ""
-    description: str = ""
-    date: str = ""
+    ref: str | None = None
+    former_ref: str | None = None
+    title: str | None = None
+    description: str | None = None
+    date: str | None = None
     is_digitised: bool | None = None
     held_by: dict = {}
-    legal_status: str = ""
-    closure_status: str = ""
-    access_condition: str = ""
+    legal_status: str | None = None
+    closure_status: str | None = None
+    access_condition: str | None = None
     languages: list[str] = []
     hierarchy: list[dict] = []
 
@@ -36,21 +36,21 @@ class Record(Details):
 
 class Aggregation(Details):
     type: str = "aggregation"
-    iaid: str = ""
-    title: str = ""
-    description: str = ""
-    physical_description: str = ""
-    administrative_background: str = ""
-    arrangement: str = ""
-    date: str = ""
+    iaid: str | None = None
+    title: str | None = None
+    description: str | None = None
+    physical_description: str | None = None
+    administrative_background: str | None = None
+    arrangement: str | None = None
+    date: str | None = None
     is_digitised: bool | None = None
     held_by: dict = {}
     creators: list[dict] = []
     acquisition: list[dict] = []
-    unpublished_finding_aids: str = ""
-    legal_status: str = ""
-    closure_status: str = ""
-    access_condition: str = ""
+    unpublished_finding_aids: str | None = None
+    legal_status: str | None = None
+    closure_status: str | None = None
+    access_condition: str | None = None
     languages: list[str] = []
     hierarchy: list[dict] = []
 
@@ -60,11 +60,11 @@ class Aggregation(Details):
 
 class RecordCreator(Details):
     type: str = "creator"
-    name: str = ""
-    date: str = ""
+    name: str | None = None
+    date: str | None = None
     places: list[str] = []
-    identifier: str = ""
-    history: str = ""
+    identifier: str | None = None
+    history: str | None = None
 
     def __init__(self, id: str):
         super().__init__(id)
@@ -73,10 +73,10 @@ class RecordCreator(Details):
 class RecordCreatorPerson(RecordCreator):
     type: str = "person"
     name_parts: dict = {}
-    date: str = ""
-    gender: str = ""
-    functions: str = ""
-    biography: str = ""
+    date: str | None = None
+    gender: str | None = None
+    functions: str | None = None
+    biography: str | None = None
 
     def __init__(self, id: str):
         super().__init__(id)
@@ -84,13 +84,13 @@ class RecordCreatorPerson(RecordCreator):
 
 class RecordArchive(Details):
     type: str = "archive"
-    name: str = ""
-    archon_code: str = ""
-    opening_times: str = ""
-    disabled_access: str = ""
-    information: str = ""
-    fee: str = ""
-    appointment: str = ""
+    name: str | None = None
+    archon_code: str | None = None
+    opening_times: str | None = None
+    disabled_access: str | None = None
+    information: str | None = None
+    fee: str | None = None
+    appointment: str | None = None
     contact_info: dict = {}
     places: list[str] = []
     accumulation_dates: list[str] = []

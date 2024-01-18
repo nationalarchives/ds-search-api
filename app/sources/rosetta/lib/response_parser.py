@@ -63,9 +63,9 @@ class RosettaSourceParser:
                 return self.source["@admin"]["id"]
         return ""
 
-    def iaid(self) -> str:
+    def iaid(self) -> str | None:
         if "identifier" in self.source:
-            if iaid := next(
+            return next(
                 (
                     item["value"]
                     for item in self.source["identifier"]
@@ -74,15 +74,14 @@ class RosettaSourceParser:
                     and "value" in item
                 ),
                 None,
-            ):
-                return iaid
-        return ""
+            )
+        return None
 
-    def uuid(self) -> str:
+    def uuid(self) -> str | None:
         if "@admin" in self.source:
             if "uuid" in self.source["@admin"]:
                 return self.source["@admin"]["uuid"]
-        return ""
+        return None
 
     def is_digitised(self) -> bool:
         if "digitised" in self.source:
@@ -103,7 +102,7 @@ class RosettaSourceParser:
         if summary_title := self.summary_title():
             return summary_title
         if "title" in self.source:
-            if primary_title := next(
+            if title := next(
                 (
                     item["value"]
                     for item in self.source["title"]
@@ -111,25 +110,25 @@ class RosettaSourceParser:
                 ),
                 None,
             ):
-                return primary_title
+                return title
         if name := self.name():
             return name
         if description := self.description():
             return description
         return ""
 
-    def summary_title(self) -> str:
+    def summary_title(self) -> str | None:
         return (
             self.source["summary"]["title"]
             if "summary" in self.source and "title" in self.source["summary"]
-            else ""
+            else None
         )
 
-    def name(self) -> str:
+    def name(self) -> str | None:
         names = self.names()
         if "name" in names:
             return names["name"]
-        return self.title() or ""
+        return self.title() or None
 
     def names(self) -> dict:
         names = {}
@@ -156,21 +155,20 @@ class RosettaSourceParser:
                     names["title"] = name_data["title"]
                 if full_name:
                     names["name"] = " ".join(full_name)
-            if aka := next(
+            names["alternative_names"] = next(
                 (
                     item["value"]
                     for item in self.source["name"]
                     if "type" in item and item["type"] == "also known as"
                 ),
                 None,
-            ):
-                names["alternative_names"] = aka
+            )
         return names
 
-    def date(self) -> str:
-        return self.lifespan() or self.date_range() or ""
+    def date(self) -> str | None:
+        return self.lifespan() or self.date_range() or None
 
-    def lifespan(self) -> str:
+    def lifespan(self) -> str | None:
         if "birth" in self.source or "death" in self.source:
             date_from = (
                 self.source["birth"]["date"]["value"]
@@ -186,10 +184,10 @@ class RosettaSourceParser:
                 and "value" in self.source["death"]["date"]
                 else ""
             )
-            return f"{date_from}–{date_to}"
-        return ""
+            return f"{date_from}–{date_to}" if date_from or date_to else None
+        return None
 
-    def date_range(self) -> str:
+    def date_range(self) -> str | None:
         date_from = (
             next(
                 (
@@ -234,7 +232,7 @@ class RosettaSourceParser:
             )
         if date_from or date_to:
             return f"{date_from}–{date_to}"
-        return ""
+        return None
 
     def places(self) -> list[str]:
         places = []
@@ -292,16 +290,16 @@ class RosettaSourceParser:
             ]
         return ""
 
-    def place_opening_times(self) -> str:
+    def place_opening_times(self) -> str | None:
         if "place" in self.source:
             for place in self.source["place"]:
                 if "description" in place and "value" in place["description"]:
                     document = PyQuery(place["description"]["value"])
                     if opening_times := document("span.openinghours").text():
                         return opening_times
-        return ""
+        return None
 
-    def place_disabled_access(self) -> str:
+    def place_disabled_access(self) -> str | None:
         if "place" in self.source:
             for place in self.source["place"]:
                 if "description" in place and "value" in place["description"]:
@@ -310,36 +308,36 @@ class RosettaSourceParser:
                         "span.disabledaccess"
                     ).text():
                         return disabled_access
-        return ""
+        return None
 
-    def place_comments(self) -> str:
+    def place_comments(self) -> str | None:
         if "place" in self.source:
             for place in self.source["place"]:
                 if "description" in place and "value" in place["description"]:
                     document = PyQuery(place["description"]["value"])
                     if comments := document("span.comments").text():
                         return comments
-        return ""
+        return None
 
-    def place_fee(self) -> str:
+    def place_fee(self) -> str | None:
         if "place" in self.source:
             for place in self.source["place"]:
                 if "description" in place and "value" in place["description"]:
                     document = PyQuery(place["description"]["value"])
                     if fee := document("span.fee").text():
                         return fee
-        return ""
+        return None
 
-    def place_appointment(self) -> str:
+    def place_appointment(self) -> str | None:
         if "place" in self.source:
             for place in self.source["place"]:
                 if "description" in place and "value" in place["description"]:
                     document = PyQuery(place["description"]["value"])
                     if appointment := document("span.appointment").text():
                         return appointment
-        return []
+        return None
 
-    def gender(self) -> str:
+    def gender(self) -> str | None:
         if "gender" in self.source:
             return (
                 "Male"
@@ -348,7 +346,7 @@ class RosettaSourceParser:
                 if self.source["gender"] == "F"
                 else self.source["gender"]
             )
-        return ""
+        return None
 
     def contact_info(self) -> dict:
         if "description" in self.source:
@@ -367,18 +365,18 @@ class RosettaSourceParser:
                     "address_line_1": document("addressline1")
                     .text()
                     .replace("<br /><br />", ", "),
-                    "town": document("addresstown").text(),
-                    "postcode": document("postcode").text(),
-                    "country": document("addresscountry").text(),
-                    "map_url": document("mapURL").text(),
-                    "url": document("url").text(),
-                    "phone": document("telephone").text(),
-                    "fax": document("fax").text(),
-                    "email": document("email").text(),
+                    "town": document("addresstown").text() or None,
+                    "postcode": document("postcode").text() or None,
+                    "country": document("addresscountry").text() or None,
+                    "map_url": document("mapURL").text() or None,
+                    "url": document("url").text() or None,
+                    "phone": document("telephone").text() or None,
+                    "fax": document("fax").text() or None,
+                    "email": document("email").text() or None,
                 }
         return {}
 
-    def description(self) -> str:
+    def description(self) -> str | None:
         if "description" in self.source:
             if description := next(
                 (
@@ -405,7 +403,7 @@ class RosettaSourceParser:
                     for tag in ("foa", "function", "address"):
                         if doc_value := document(tag).text():
                             return doc_value
-            if default_description := next(
+            return next(
                 (
                     item["value"]
                     for item in self.source["description"]
@@ -414,11 +412,10 @@ class RosettaSourceParser:
                     and item["type"] == "description"
                 ),
                 None,
-            ):
-                return default_description
-        return ""
+            )
+        return None
 
-    def administrative_background(self) -> str:
+    def administrative_background(self) -> str | None:
         if (
             "origination" in self.source
             and "description" in self.source["origination"]
@@ -435,9 +432,9 @@ class RosettaSourceParser:
             ):
                 document = PyQuery(administrative_background)
                 return str(document("span.bioghist").contents().eq(0))
-        return ""
+        return None
 
-    def functions(self) -> str:
+    def functions(self) -> str | None:
         if "description" in self.source:
             functions = next(
                 (
@@ -454,17 +451,17 @@ class RosettaSourceParser:
                     if doc_value := document(tag).text():
                         return doc_value
                 return functions["value"]
-        return ""
+        return None
 
-    def physical_description(self) -> str:
+    def physical_description(self) -> str | None:
         return (
             self.source["measurements"]["display"]
             if "measurements" in self.source
             and "display" in self.source["measurements"]
-            else ""
+            else None
         )
 
-    def epithet(self) -> str:
+    def epithet(self) -> str | None:
         if "description" in self.source:
             epithet = next(
                 (
@@ -476,9 +473,9 @@ class RosettaSourceParser:
             )
             if epithet and "value" in epithet:
                 return epithet["value"]
-        return ""
+        return None
 
-    def history(self) -> str:
+    def history(self) -> str | None:
         if "description" in self.source:
             history = next(
                 (
@@ -494,9 +491,9 @@ class RosettaSourceParser:
                     if doc_value := document(tag).text():
                         return doc_value
                 return history["value"]
-        return ""
+        return None
 
-    def biography(self) -> str:
+    def biography(self) -> str | None:
         if "description" in self.source:
             biography = next(
                 (
@@ -511,9 +508,9 @@ class RosettaSourceParser:
                 text = biography["value"]
                 url = f'<a href="{url}">{text}</a>'
                 return url
-        return ""
+        return None
 
-    def identifier(self) -> str:
+    def identifier(self) -> str | None:
         if "identifier" in self.source:
             if identifier := next(
                 (
@@ -524,7 +521,6 @@ class RosettaSourceParser:
                 None,
             ):
                 return identifier
-
             primary_identifier = next(
                 (
                     item["value"]
@@ -550,11 +546,11 @@ class RosettaSourceParser:
                 if former_identifier
                 else primary_identifier
             )
-        return ""
+        return None
 
-    def former_identifier(self) -> str:
+    def former_identifier(self) -> str | None:
         if "identifier" in self.source:
-            if identifier := next(
+            return next(
                 (
                     item["value"]
                     for item in self.source["identifier"]
@@ -563,22 +559,20 @@ class RosettaSourceParser:
                     and "value" in item
                 ),
                 None,
-            ):
-                return identifier
-        return ""
+            )
+        return None
 
-    def reference_number(self) -> str:
+    def reference_number(self) -> str | None:
         if "identifier" in self.source:
-            if reference_number := next(
+            return next(
                 (
                     item["value"]
                     for item in self.source["identifier"]
                     if "type" in item and item["type"] == "reference number"
                 ),
                 None,
-            ):
-                return reference_number
-        return ""
+            )
+        return None
 
     def agents(self) -> dict:
         agents = {
@@ -649,40 +643,40 @@ class RosettaSourceParser:
                 return {"id": id, "name": name}
         return {}
 
-    def legal_status(self) -> str:
+    def legal_status(self) -> str | None:
         return (
             self.source["legal"]["status"]
             if "legal" in self.source and "status" in self.source["legal"]
-            else ""
+            else None
         )
 
-    def arrangement(self) -> str:
+    def arrangement(self) -> str | None:
         if (
             "arrangement" in self.source
             and "value" in self.source["arrangement"]
         ):
             document = PyQuery(self.source["arrangement"]["value"])
             return str(document("span.arrangement").contents())
-        return ""
+        return None
 
-    def closure_status(self) -> str:
+    def closure_status(self) -> str | None:
         return (
             self.source["availability"]["closure"]["label"]["value"]
             if "availability" in self.source
             and "closure" in self.source["availability"]
             and "label" in self.source["availability"]["closure"]
             and "value" in self.source["availability"]["closure"]["label"]
-            else ""
+            else None
         )
 
-    def access_condition(self) -> str:
+    def access_condition(self) -> str | None:
         return (
             self.source["availability"]["access"]["condition"]["value"]
             if "availability" in self.source
             and "access" in self.source["availability"]
             and "condition" in self.source["availability"]["access"]
             and "value" in self.source["availability"]["access"]["condition"]
-            else ""
+            else None
         )
 
     def creators(self) -> list[str]:
@@ -708,10 +702,16 @@ class RosettaSourceParser:
                     else ""
                 )
                 name = f"{first_names} {last_name}".strip()
+                if not name:
+                    name = (
+                        name_details["value"]
+                        if name_details and "value" in name_details
+                        else ""
+                    )
                 title = (
                     name_details["title"]
                     if name_details and "title" in name_details
-                    else ""
+                    else None
                 )
                 date_from = (
                     creator["date"]["from"]
@@ -748,7 +748,7 @@ class RosettaSourceParser:
                         acquisitor["description"]["value"]
                         if "description" in acquisitor
                         and "value" in acquisitor["description"]
-                        else ""
+                        else None
                     )
                 )
                 date_from = (
@@ -756,21 +756,21 @@ class RosettaSourceParser:
                     if "agent" in acquisitor
                     and "date" in acquisitor["agent"]
                     and "from" in acquisitor["agent"]["date"]
-                    else ""
+                    else None
                 )
                 date_to = (
                     acquisitor["agent"]["date"]["to"]
                     if "agent" in acquisitor
                     and "date" in acquisitor["agent"]
                     and "to" in acquisitor["agent"]["date"]
-                    else ""
+                    else None
                 )
                 acquisition.append(
                     {
                         "title": title,
                         "date": f"{date_from}–{date_to}"
                         if date_from or date_to
-                        else "",
+                        else None,
                     }
                 )
         return acquisition
@@ -819,8 +819,7 @@ class RosettaSourceParser:
                                 == "NRA catalogue reference (2nd part)"
                             ),
                             None,
-                        )
-                        or None,
+                        ),
                     }
                     for item in self.source["manifestations"]
                     if "title" in item and "url" in item
@@ -882,9 +881,9 @@ class RosettaSourceParser:
                 hierarchies.append(hierarchy_levels)
         return hierarchies
 
-    def unpublished_finding_aids(self) -> str:
+    def unpublished_finding_aids(self) -> str | None:
         if "note" in self.source:
-            if unpublished_finding_aids := next(
+            return next(
                 (
                     item["value"]
                     for item in self.source["note"]
@@ -893,6 +892,5 @@ class RosettaSourceParser:
                     and item["type"] == "unpublished finding aids"
                 ),
                 None,
-            ):
-                return unpublished_finding_aids
-        return ""
+            )
+        return None
