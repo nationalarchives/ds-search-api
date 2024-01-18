@@ -374,6 +374,7 @@ class RosettaSourceParser:
                     "address_line_1": document("addressline1")
                     .text()
                     .replace("<br /><br />", ", ")
+                    .replace("<br />", ", ")
                     or None,
                     "town": document("addresstown").text() or None,
                     "postcode": document("postcode").text() or None,
