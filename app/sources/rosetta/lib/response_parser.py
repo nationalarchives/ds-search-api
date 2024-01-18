@@ -34,6 +34,8 @@ class RosettaResponseParser:
 
 
 class RosettaSourceParser:
+    # Current mapping: https://github.com/nationalarchives/ds-infrastructure-ciim/blob/main/kubernetes/rosetta-staging/config/jpt.json
+
     def __init__(self, rosetta_data_source):
         self.source = rosetta_data_source
 
@@ -140,7 +142,7 @@ class RosettaSourceParser:
         names = self.names()
         if "name" in names:
             return names["name"]
-        return self.title() or None
+        return None
 
     def names(self) -> dict:
         names = {}
