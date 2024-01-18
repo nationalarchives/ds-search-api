@@ -13,7 +13,7 @@ async def index(
     page: int | None = 1,
 ) -> ArticleSearchResults:
     website_api = WebsiteArticles()
-    website_api.params = {}  # TODO: Why are params persisting?
+    # website_api.params = {}  # TODO: Why are params persisting?
     if q:
         website_api.add_query(q)
     if type:
@@ -42,39 +42,3 @@ async def index(
         website_api.add_parameter("order", "first_published_at")
     results = website_api.get_result(page)
     return results
-
-
-@router.get("/filters/")
-async def filters() -> list[Filter]:
-    filters = []
-
-    # time_period_filter = Filter("Time period", "multiple")
-    # for time_period in get_time_periods():
-    #     time_period_filter.add_filter_option(
-    #         time_period["name"], time_period["value"]
-    #     )
-    # filters.append(time_period_filter)
-
-    # topics_filter = Filter("Topic", "multiple")
-    # topics = get_topics()
-    # for topic in sorted(topics, key=lambda x: x["name"]):
-    #     topics_filter.add_filter_option(topic["name"], topic["value"])
-    # filters.append(topics_filter)
-
-    types_filter = Filter("Type", "multiple")
-    types_filter.add_filter_option(
-        "Article", "articles.ArticlePage,articles.FocusedArticlePage"
-    )
-    types_filter.add_filter_option(
-        "Gallery", "collections.HighlightGalleryPage"
-    )
-    types_filter.add_filter_option(
-        "Records revealed", "articles.RecordArticlePage"
-    )
-    types_filter.add_filter_option(
-        "Time period", "collections.TimePeriodExplorerPage"
-    )
-    types_filter.add_filter_option("Topic", "collections.TopicExplorerPage")
-    filters.append(types_filter)
-
-    return filters

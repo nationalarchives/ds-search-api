@@ -3,6 +3,8 @@ import math
 from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict
 
+from .common_filters_api import Filter
+
 
 class APISearchResult(BaseModel):
     title: str | None = None
@@ -23,6 +25,7 @@ class APISearchResponse(BaseModel):
     result_range_max: int = 0
     results_per_page: int = 0
     results: list[APISearchResult] = []
+    filters: list[Filter] = []
     source_url: str = ""
 
     def get_pages(self):
@@ -50,7 +53,6 @@ class APISearchResponse(BaseModel):
                 "pages": self.get_pages(),
                 "result_range_min": self.get_result_range_min(),
                 "result_range_max": self.get_result_range_max(),
-                "foo": "bar",
                 "results": [result.toJSON() for result in self.results],
             }
         raise HTTPException(

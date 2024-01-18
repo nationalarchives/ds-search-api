@@ -8,6 +8,7 @@ from app.records.schemas import (
     RecordSearchResult,
     RecordSearchResults,
 )
+from app.schemas import Filter
 from config import Config
 from pydash import objects
 
@@ -27,6 +28,31 @@ class RosettaRecordsSearch(RosettaRecords):
     def add_query(self, query_string: str) -> None:
         self.add_parameter("q", query_string)
 
+    def filters(self) -> list[Filter]:
+        filters = []
+
+        refine_filter = Filter("Refine results", "text")
+        filters.append(refine_filter)
+
+        covering_date_filter = Filter("Covering date", "daterange")
+        filters.append(covering_date_filter)
+
+        collections_filter = Filter("Collections", "multiple")
+        collections_filter.add_filter_option(
+            "Admiralty, Navy, Royal Marines, and Coastguard", "0"
+        )
+        collections_filter.add_filter_option(
+            "Air Ministry and Royal Air Force records", "1"
+        )
+        filters.append(collections_filter)
+
+        level_filter = Filter("Level", "multiple")
+        level_filter.add_filter_option("Division", "0")
+        level_filter.add_filter_option("Item", "1")
+        filters.append(level_filter)
+
+        return filters
+
     def get_result(
         self, page: int | None = 1, highlight: bool | None = False
     ) -> dict:
@@ -36,9 +62,11 @@ class RosettaRecordsSearch(RosettaRecords):
         url = self.build_url()
         raw_results = self.execute(url)
         results = self.parse_results(raw_results, page, url)
-        stats_api = RosettaRecordsSearchStats(self.params["q"])
-        results_stats = stats_api.get_result()
-        results.results_stats = results_stats
+        # TODO: Can we get aggregated stats?
+        # stats_api = RosettaRecordsSearchStats(self.params["q"])
+        # results_stats = stats_api.get_result()
+        # results.results_stats = results_stats
+        results.filters = self.filters()
         return results.toJSON() if results.page_in_range() else {}
 
     def parse_results(
@@ -102,6 +130,12 @@ class RosettaRecordsSearchStats(RosettaRecords):
             results_count = objects.get(raw_results, "stats.total")
             stats[group] = results_count
         return stats
+
+
+class RosettaRecordsSearchAll(RosettaRecords):
+    def __init__(self):
+        super().__init__()
+        self.api_path = "/searchAll"
 
 
 class RosettaRecordDetails(RosettaRecords):

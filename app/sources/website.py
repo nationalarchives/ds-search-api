@@ -2,6 +2,7 @@ import math
 
 from app.articles.schemas import Article, ArticleSearchResults
 from app.lib.api import GetAPI
+from app.schemas import Filter
 from config import Config
 
 
@@ -21,6 +22,40 @@ class WebsiteArticles(WagtailAPI):
 
     def add_query(self, query_string: str) -> None:
         self.add_parameter("search", query_string)
+
+    def filters(self) -> list[Filter]:
+        filters = []
+
+        # time_period_filter = Filter("Time period", "multiple")
+        # for time_period in get_time_periods():
+        #     time_period_filter.add_filter_option(
+        #         time_period["name"], time_period["value"]
+        #     )
+        # filters.append(time_period_filter)
+
+        # topics_filter = Filter("Topic", "multiple")
+        # topics = get_topics()
+        # for topic in sorted(topics, key=lambda x: x["name"]):
+        #     topics_filter.add_filter_option(topic["name"], topic["value"])
+        # filters.append(topics_filter)
+
+        types_filter = Filter("Type", "multiple")
+        types_filter.add_filter_option(
+            "Article", "articles.ArticlePage,articles.FocusedArticlePage"
+        )
+        types_filter.add_filter_option(
+            "Gallery", "collections.HighlightGalleryPage"
+        )
+        types_filter.add_filter_option(
+            "Records revealed", "articles.RecordArticlePage"
+        )
+        types_filter.add_filter_option(
+            "Time period", "collections.TimePeriodExplorerPage"
+        )
+        types_filter.add_filter_option("Topic", "collections.TopicExplorerPage")
+        filters.append(types_filter)
+
+        return filters
 
     def get_result(self, page: int | None = 1) -> dict:
         offset = (page - 1) * self.results_per_page
@@ -51,6 +86,7 @@ class WebsiteArticles(WagtailAPI):
         response.results_per_page = self.results_per_page
         response.page = page
         response.source_url = url
+        response.filters = self.filters()
         return response.toJSON()
 
 
