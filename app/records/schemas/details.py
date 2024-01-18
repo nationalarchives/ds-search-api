@@ -18,6 +18,7 @@ class Details(BaseModel):
 class Record(Details):
     type: str = "record"
     ref: str | None = None
+    iaid: str | None = None
     former_ref: str | None = None
     title: str | None = None
     description: str | None = None
@@ -36,6 +37,7 @@ class Record(Details):
 
 class Aggregation(Details):
     type: str = "aggregation"
+    ref: str | None = None
     iaid: str | None = None
     title: str | None = None
     description: str | None = None

@@ -38,7 +38,7 @@ class RosettaSourceParser:
         self.source = rosetta_data_source
 
     def strip_scope_and_content(self, markup):
-        document = PyQuery(markup)
+        document = PyQuery(markup.replace("<p/>", ""))
         return str(document("span.scopecontent").contents())
 
     def strip_wrapper_and_split_span(self, markup):
@@ -431,7 +431,7 @@ class RosettaSourceParser:
                 None,
             ):
                 document = PyQuery(administrative_background)
-                return str(document("span.bioghist").contents().eq(0))
+                return str(document("span.bioghist").contents())
         return None
 
     def functions(self) -> str | None:
