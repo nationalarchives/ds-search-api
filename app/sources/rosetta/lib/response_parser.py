@@ -99,9 +99,19 @@ class RosettaSourceParser:
         return self.is_digitised() or False
 
     def title(self) -> str:
-        if summary_title := self.summary_title():
-            return summary_title
         if "title" in self.source:
+            if display_title := next(
+                (
+                    item["label"]["value"]
+                    for item in self.source["title"]
+                    if "label" in item
+                    and "value" in item["label"]
+                    and "type" in item["label"]
+                    and item["label"]["type"] == "display"
+                ),
+                None,
+            ):
+                return display_title
             if title := next(
                 (
                     item["value"]
@@ -113,6 +123,8 @@ class RosettaSourceParser:
                 return title
         if name := self.name():
             return name
+        if summary_title := self.summary_title():
+            return summary_title
         if description := self.description():
             return description
         return ""

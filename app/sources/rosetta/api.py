@@ -92,6 +92,7 @@ class RosettaRecordDetails(RosettaRecords):
             record.iaid = parsed_data.iaid()
             record.former_ref = parsed_data.former_identifier()
             record.title = parsed_data.title()
+            record.summary_title = parsed_data.summary_title()
             record.description = parsed_data.description()
             record.date = parsed_data.date_range()
             record.is_digitised = parsed_data.is_digitised()
@@ -112,6 +113,7 @@ class RosettaRecordDetails(RosettaRecords):
             record.ref = parsed_data.identifier()
             record.iaid = parsed_data.iaid()
             record.title = parsed_data.title()
+            record.summary_title = parsed_data.summary_title()
             record.description = parsed_data.description()
             record.physical_description = parsed_data.physical_description()
             record.administrative_background = (

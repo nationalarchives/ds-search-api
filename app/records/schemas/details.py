@@ -21,6 +21,7 @@ class Record(Details):
     iaid: str | None = None
     former_ref: str | None = None
     title: str | None = None
+    summary_title: str | None = None
     description: str | None = None
     date: str | None = None
     is_digitised: bool | None = None
@@ -40,6 +41,7 @@ class Aggregation(Details):
     ref: str | None = None
     iaid: str | None = None
     title: str | None = None
+    summary_title: str | None = None
     description: str | None = None
     physical_description: str | None = None
     administrative_background: str | None = None
