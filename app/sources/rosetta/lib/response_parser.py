@@ -342,11 +342,34 @@ class RosettaSourceParser:
             ):
                 ephemera = (
                     ephemera.replace("mapURL", "mapurl")
-                    .replace("jobTitle", "jobtitle")
-                    .replace("firstName", "firstname")
-                    .replace("lastName", "lastname")
+                    .replace("jobTitle", "job_title")
+                    .replace("firstName", "first_name")
+                    .replace("lastName", "last_name")
                 )
                 document = PyQuery(ephemera)
+                contacts = []
+                for contact in document("contact"):
+                    first_name_el = contact.find("first_name")
+                    first_name = (
+                        first_name_el.text
+                        if first_name_el is not None
+                        else None
+                    )
+                    last_name_el = contact.find("last_name")
+                    last_name = (
+                        last_name_el.text if last_name_el is not None else None
+                    )
+                    job_title_el = contact.find("job_title")
+                    job_title = (
+                        job_title_el.text if job_title_el is not None else None
+                    )
+                    contacts.append(
+                        {
+                            "first_name": first_name,
+                            "last_name": last_name,
+                            "job_title": job_title,
+                        }
+                    )
                 return {
                     "address_line_1": document("addressline1")
                     .text()
@@ -360,15 +383,7 @@ class RosettaSourceParser:
                     "phone": document("telephone").text() or None,
                     "fax": document("fax").text() or None,
                     "email": document("email").text() or None,
-                    "contacts": [
-                        {
-                            "first_name": contact.find("firstname").text
-                            or None,
-                            "last_name": contact.find("lastname").text or None,
-                            "job_title": contact.find("jobtitle").text or None,
-                        }
-                        for contact in document("contact")
-                    ],
+                    "contacts": contacts,
                 }
         return {}
 
