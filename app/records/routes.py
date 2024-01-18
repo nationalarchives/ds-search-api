@@ -1,6 +1,10 @@
 from app.records import router
 from app.schemas import Filter
-from app.sources.rosetta import RosettaRecordDetails, RosettaRecordsSearch
+from app.sources.rosetta import (
+    RosettaRecordDetails,
+    RosettaRecordsSearch,
+    RosettaRecordsSearchStats,
+)
 
 from .schemas import Record, RecordArchive, RecordCreator, RecordSearchResults
 

@@ -17,6 +17,10 @@ class GetAPI(BaseAPI):
     results_per_page: int = 20
     params: dict = {}
 
+    def __init__(self):
+        super().__init__()
+        self.params = {}
+
     def add_parameter(self, key: str, value: str | int) -> None:
         self.params[key] = value
 

@@ -340,11 +340,18 @@ class RosettaSourceParser:
                 ),
                 None,
             ):
+                ephemera = (
+                    ephemera.replace("mapURL", "mapurl")
+                    .replace("jobTitle", "jobtitle")
+                    .replace("firstName", "firstname")
+                    .replace("lastName", "lastname")
+                )
                 document = PyQuery(ephemera)
                 return {
                     "address_line_1": document("addressline1")
                     .text()
-                    .replace("<br /><br />", ", "),
+                    .replace("<br /><br />", ", ")
+                    or None,
                     "town": document("addresstown").text() or None,
                     "postcode": document("postcode").text() or None,
                     "country": document("addresscountry").text() or None,
@@ -353,6 +360,15 @@ class RosettaSourceParser:
                     "phone": document("telephone").text() or None,
                     "fax": document("fax").text() or None,
                     "email": document("email").text() or None,
+                    "contacts": [
+                        {
+                            "first_name": contact.find("firstname").text
+                            or None,
+                            "last_name": contact.find("lastname").text or None,
+                            "job_title": contact.find("jobtitle").text or None,
+                        }
+                        for contact in document("contact")
+                    ],
                 }
         return {}
 

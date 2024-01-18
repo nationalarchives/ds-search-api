@@ -1,1 +1,5 @@
-from .api import RosettaRecordDetails, RosettaRecordsSearch
+from .api import (
+    RosettaRecordDetails,
+    RosettaRecordsSearch,
+    RosettaRecordsSearchStats,
+)

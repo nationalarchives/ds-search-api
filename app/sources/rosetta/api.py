@@ -9,6 +9,7 @@ from app.records.schemas import (
     RecordSearchResults,
 )
 from config import Config
+from pydash import objects
 
 from .lib import RosettaResponseParser, RosettaSourceParser
 
@@ -34,9 +35,15 @@ class RosettaRecordsSearch(RosettaRecords):
         self.add_parameter("from", offset)
         url = self.build_url()
         raw_results = self.execute(url)
-        return self.parse_results(raw_results, page, url)
+        results = self.parse_results(raw_results, page, url)
+        stats_api = RosettaRecordsSearchStats(self.params["q"])
+        results_stats = stats_api.get_result()
+        results.results_stats = results_stats
+        return results.toJSON() if results.page_in_range() else {}
 
-    def parse_results(self, raw_results, page, source_url) -> dict:
+    def parse_results(
+        self, raw_results, page, source_url
+    ) -> RecordSearchResults:
         response = RecordSearchResults()
         response.source_url = source_url
         for r in raw_results["metadata"]:
@@ -69,7 +76,32 @@ class RosettaRecordsSearch(RosettaRecords):
         )
         response.results_per_page = self.results_per_page
         response.page = page
-        return response.toJSON() if response.page_in_range() else {}
+        return response
+
+
+class RosettaRecordsSearchStats(RosettaRecords):
+    def __init__(self, query_string):
+        super().__init__()
+        self.api_path = "/search"
+        self.add_parameter("q", query_string)
+
+    def get_result(self) -> dict:
+        stats = {
+            "tna": None,
+            "digitised": None,
+            "nonTna": None,
+            "creator": None,
+            "archive": None,
+        }
+        for group in stats:
+            self.add_parameter("filter", f"group:({group})")
+            url = self.build_url()
+            print(url)
+            raw_results = self.execute(url)
+            print(url)
+            results_count = objects.get(raw_results, "stats.total")
+            stats[group] = results_count
+        return stats
 
 
 class RosettaRecordDetails(RosettaRecords):

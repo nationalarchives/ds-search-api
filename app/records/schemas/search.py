@@ -19,3 +19,4 @@ class RecordSearchResults(APISearchResponse):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     results: list[RecordSearchResult] = []
+    results_stats: dict = {}
