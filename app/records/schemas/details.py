@@ -30,6 +30,7 @@ class Record(Details):
     closure_status: str | None = None
     access_condition: str | None = None
     languages: list[str] = []
+    related_materials: list[dict] = []
     hierarchy: list[dict] = []
 
     def __init__(self, id: str):
@@ -56,6 +57,7 @@ class Aggregation(Details):
     closure_status: str | None = None
     access_condition: str | None = None
     languages: list[str] = []
+    related_materials: list[dict] = []
     hierarchy: list[dict] = []
 
     def __init__(self, id: str):

@@ -14,6 +14,7 @@ isort = "^5.12.0"
 requests = "^2.31.0"
 fastapi = "^0.108.0"
 pyquery = "^2.0.0"
+pydash = "^7.0.6"
 
 [build-system]
 requires = ["poetry-core"]
