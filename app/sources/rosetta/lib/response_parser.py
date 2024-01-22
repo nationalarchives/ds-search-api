@@ -279,6 +279,15 @@ class RosettaSourceParser:
                         return opening_times
         return None
 
+    def place_holidays(self) -> str | None:
+        if "place" in self.source:
+            for place in self.source["place"]:
+                if place_details := objects.get(place, "description.value"):
+                    document = PyQuery(place_details)
+                    if holidays := document("span.holidays").text():
+                        return holidays
+        return None
+
     def place_disabled_access(self) -> str | None:
         if "place" in self.source:
             for place in self.source["place"]:
@@ -306,6 +315,15 @@ class RosettaSourceParser:
                     document = PyQuery(place_details)
                     if fee := document("span.fee").text():
                         return fee
+        return None
+
+    def place_tickets(self) -> str | None:
+        if "place" in self.source:
+            for place in self.source["place"]:
+                if place_details := objects.get(place, "description.value"):
+                    document = PyQuery(place_details)
+                    if tickets := document("span.ticket").text():
+                        return tickets
         return None
 
     def place_appointment(self) -> str | None:

@@ -93,9 +93,11 @@ class RecordArchive(Details):
     name: str | None = None
     archon_code: str | None = None
     opening_times: str | None = None
+    holidays: str | None = None
     disabled_access: str | None = None
     information: str | None = None
     fee: str | None = None
+    ticket: str | None = None
     appointment: str | None = None
     contact_info: dict = {}
     places: list[str] = []
