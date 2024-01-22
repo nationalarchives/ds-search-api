@@ -96,9 +96,9 @@ class RecordArchive(Details):
     holidays: str | None = None
     disabled_access: str | None = None
     information: str | None = None
-    fee: str | None = None
-    ticket: str | None = None
-    appointment: str | None = None
+    fees: str | None = None
+    tickets: str | None = None
+    appointments: str | None = None
     contact_info: dict = {}
     places: list[str] = []
     accumulation_dates: list[str] = []
