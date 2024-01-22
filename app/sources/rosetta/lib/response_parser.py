@@ -602,6 +602,9 @@ class RosettaSourceParser:
                 None,
             )
         return None
+    
+    def repository_url(self) -> str | None:
+        return objects.get(self.source, "repository.url")
 
     def agents(self) -> dict:
         agents = {

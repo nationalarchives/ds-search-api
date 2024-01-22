@@ -92,6 +92,7 @@ class RecordArchive(Details):
     type: str = "archive"
     name: str | None = None
     archon_code: str | None = None
+    repository_url: str | None = None
     opening_times: str | None = None
     holidays: str | None = None
     disabled_access: str | None = None
