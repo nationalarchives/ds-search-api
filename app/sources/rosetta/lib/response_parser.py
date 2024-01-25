@@ -1,6 +1,3 @@
-import re
-from enum import Enum
-
 from pydash import objects
 from pyquery import PyQuery
 
@@ -663,7 +660,10 @@ class RosettaSourceParser:
     def arrangement(self) -> str | None:
         if arrangement := objects.get(self.source, "arrangement.value"):
             document = PyQuery(arrangement)
-            return str(document("span.arrangement").contents())
+            if arrangement_contents := document("span.arrangement").contents():
+                return str(arrangement_contents)
+            if arrangement_wrapper := document("span.wrapper").html():
+                return arrangement_wrapper
         return None
 
     def closure_status(self) -> str | None:
