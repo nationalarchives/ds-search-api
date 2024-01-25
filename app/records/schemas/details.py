@@ -23,28 +23,6 @@ class Record(Details):
     title: str | None = None
     summary_title: str | None = None
     description: str | None = None
-    date: str | None = None
-    is_digitised: bool | None = None
-    held_by: dict = {}
-    legal_status: str | None = None
-    closure_status: str | None = None
-    access_condition: str | None = None
-    notes: list[str] = []
-    languages: list[str] = []
-    related_materials: list[dict] = []
-    hierarchy: list[dict] = []
-
-    def __init__(self, id: str):
-        super().__init__(id)
-
-
-class Aggregation(Details):
-    type: str = "aggregation"
-    ref: str | None = None
-    iaid: str | None = None
-    title: str | None = None
-    summary_title: str | None = None
-    description: str | None = None
     physical_description: str | None = None
     administrative_background: str | None = None
     arrangement: str | None = None
@@ -53,11 +31,11 @@ class Aggregation(Details):
     held_by: dict = {}
     creators: list[dict] = []
     acquisition: list[dict] = []
-    unpublished_finding_aids: str | None = None
     legal_status: str | None = None
     closure_status: str | None = None
     access_condition: str | None = None
     notes: list[str] = []
+    unpublished_finding_aids: str | None = None
     languages: list[str] = []
     related_materials: list[dict] = []
     hierarchy: list[dict] = []
