@@ -602,7 +602,7 @@ class RosettaSourceParser:
                 None,
             )
         return None
-    
+
     def repository_url(self) -> str | None:
         return objects.get(self.source, "repository.url")
 
@@ -848,4 +848,11 @@ class RosettaSourceParser:
                 ),
                 None,
             )
+        return None
+
+    def notes(self) -> list[str] | None:
+        if "note" in self.source:
+            return [
+                note["value"] for note in self.source["note"] if "value" in note
+            ]
         return None

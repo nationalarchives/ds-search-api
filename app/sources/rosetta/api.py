@@ -166,6 +166,7 @@ class RosettaRecordDetails(RosettaRecords):
             record.legal_status = parsed_data.legal_status()
             record.closure_status = parsed_data.closure_status()
             record.access_condition = parsed_data.access_condition()
+            record.notes = parsed_data.notes()
             record.languages = parsed_data.languages()
             record.related_materials = parsed_data.related_materials()
             record.hierarchy = (
@@ -198,6 +199,7 @@ class RosettaRecordDetails(RosettaRecords):
             record.legal_status = parsed_data.legal_status()
             record.closure_status = parsed_data.closure_status()
             record.access_condition = parsed_data.access_condition()
+            record.notes = parsed_data.notes()
             record.languages = parsed_data.languages()
             record.related_materials = parsed_data.related_materials()
             record.hierarchy = (

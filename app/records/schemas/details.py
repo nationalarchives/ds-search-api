@@ -29,6 +29,7 @@ class Record(Details):
     legal_status: str | None = None
     closure_status: str | None = None
     access_condition: str | None = None
+    notes: list[str] = []
     languages: list[str] = []
     related_materials: list[dict] = []
     hierarchy: list[dict] = []
@@ -56,6 +57,7 @@ class Aggregation(Details):
     legal_status: str | None = None
     closure_status: str | None = None
     access_condition: str | None = None
+    notes: list[str] = []
     languages: list[str] = []
     related_materials: list[dict] = []
     hierarchy: list[dict] = []
