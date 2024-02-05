@@ -621,8 +621,8 @@ class RosettaSourceParser:
                     ),
                     None,
                 ):
-                    id = objects.get(self.source, "@admin.id")
-                    name = objects.get(self.source, "name.value")
+                    id = objects.get(agent, "@admin.id")
+                    name = objects.get(agent, "name.value")
                     if id and name:
                         places = (
                             [
