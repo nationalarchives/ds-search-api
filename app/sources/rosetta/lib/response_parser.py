@@ -812,28 +812,40 @@ class RosettaSourceParser:
         related_materials = []
         if "related" in self.source:
             for item in self.source["related"]:
-                id = objects.get(item, "@admin.id")
-                title = objects.get(item, "summary.title")
-                note = objects.get(item, "@link.note.value")
-                related_material = {
-                    "id": id,
-                    "title": title,
-                    "ref": None,
-                    "note": note,
-                }
-                if "identifier" in item:
-                    if reference_number := next(
-                        (
-                            identifier["value"]
-                            for identifier in item["identifier"]
-                            if "value" in identifier
-                            and "type" in identifier
-                            and identifier["type"] == "reference number"
-                        ),
-                        None,
-                    ):
-                        related_material["ref"] = reference_number
-                related_materials.append(related_material)
+                if "@entity" in item and item["@entity"] == "literal":
+                    if note := objects.get(item, "@link.note.value"):
+                        related_materials.append(
+                            {
+                                "id": None,
+                                "title": None,
+                                "ref": None,
+                                "note": note,
+                            }
+                        )
+            for item in self.source["related"]:
+                if "@entity" in item and item["@entity"] == "reference":
+                    id = objects.get(item, "@admin.id")
+                    title = objects.get(item, "summary.title")
+                    note = objects.get(item, "@link.note.value")
+                    related_material = {
+                        "id": id,
+                        "title": title,
+                        "ref": None,
+                        "note": note,
+                    }
+                    if "identifier" in item:
+                        if reference_number := next(
+                            (
+                                identifier["value"]
+                                for identifier in item["identifier"]
+                                if "value" in identifier
+                                and "type" in identifier
+                                and identifier["type"] == "reference number"
+                            ),
+                            None,
+                        ):
+                            related_material["ref"] = reference_number
+                    related_materials.append(related_material)
         return related_materials
 
     def unpublished_finding_aids(self) -> str | None:
