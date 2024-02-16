@@ -13,7 +13,7 @@ async def index(
     page: int | None = 1,
 ) -> ArticleSearchResults:
     website_api = WebsiteArticles()
-    # website_api.params = {}  # TODO: Why are params persisting?
+    website_api.params = {}  # TODO: Why are params persisting?
     if q:
         website_api.add_query(q)
     if type:
