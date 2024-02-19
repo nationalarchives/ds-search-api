@@ -15,6 +15,6 @@ services:
       - ./:/app
 
   dev:
-    image: ghcr.io/nationalarchives/tna-python-dev:preview
+    image: ghcr.io/nationalarchives/tna-python-dev:latest
     volumes:
       - ./:/app
