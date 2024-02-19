@@ -150,7 +150,10 @@ class RosettaRecordDetails(RosettaRecords):
         return self.parse_results(raw_results, url)
 
     def parse_results(self, raw_results, source_url):
-        parsed_data = RosettaResponseParser(raw_results)
+        try:
+            parsed_data = RosettaResponseParser(raw_results)
+        except Exception:
+            raise Exception("Respone is not recognised")
         if (
             parsed_data.type() == "record"
             or parsed_data.type() == "aggregation"

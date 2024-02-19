@@ -5,6 +5,7 @@ from app.sources.rosetta import (
     RosettaRecordsSearch,
     RosettaRecordsSearchStats,
 )
+from fastapi import HTTPException
 
 from .schemas import Record, RecordArchive, RecordCreator, RecordSearchResults
 
@@ -80,5 +81,8 @@ async def item(
     id: str,
 ):  # ) -> Record | RecordCreator | RecordArchive:
     rosetta_api = RosettaRecordDetails()
-    result = rosetta_api.get_result(id)
+    try:
+        result = rosetta_api.get_result(id)
+    except Exception:
+        raise HTTPException(status_code=404, detail="Record not found")
     return result
