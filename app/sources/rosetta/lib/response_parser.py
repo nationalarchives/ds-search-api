@@ -167,16 +167,17 @@ class RosettaSourceParser:
         return names
 
     def date(self) -> str | None:
-        return self.lifespan() or self.date_range() or None
-
-    def lifespan(self) -> str | None:
-        if "birth" in self.source or "death" in self.source:
-            date_from = objects.get(self.source, "birth.date.value") or ""
-            date_to = objects.get(self.source, "death.date.value") or ""
-            return f"{date_from}–{date_to}" if date_from or date_to else None
+        date_from = self.date_from()
+        date_to = self.date_to()
+        if date_from or date_to:
+            return f"{date_from}–{date_to}"
         return None
 
-    def date_range(self) -> str | None:
+    def date_from(self) -> str | None:
+        if date_from := self.birth():
+            return date_from
+        if date_from := self.origination_start_date():
+            return date_from
         date_from = (
             next(
                 (
@@ -189,6 +190,13 @@ class RosettaSourceParser:
             if "start" in self.source and "date" in self.source["start"]
             else ""
         )
+        return date_from
+
+    def date_to(self) -> str | None:
+        if date_to := self.death():
+            return date_to
+        if date_to := self.origination_end_date():
+            return date_to
         date_to = (
             next(
                 (
@@ -201,19 +209,19 @@ class RosettaSourceParser:
             if "end" in self.source and "date" in self.source["end"]
             else ""
         )
-        if date_from or date_to:
-            return f"{date_from}–{date_to}"
-        if (
-            "origination" in self.source
-            and "date" in self.source["origination"]
-        ):
-            if value := self.source["origination"]["date"]["value"]:
-                return value
-            date_from = objects.get(self.source, "origination.date.from") or ""
-            date_to = objects.get(self.source, "origination.date.to") or ""
-        if date_from or date_to:
-            return f"{date_from}–{date_to}"
-        return None
+        return date_to
+
+    def birth(self) -> str | None:
+        return objects.get(self.source, "birth.date.value")
+
+    def death(self) -> str | None:
+        return objects.get(self.source, "death.date.value")
+
+    def origination_start_date(self) -> str | None:
+        return objects.get(self.source, "origination.date.from")
+
+    def origination_end_date(self) -> str | None:
+        return objects.get(self.source, "origination.date.to")
 
     def places(self) -> list[str]:
         places = []
@@ -341,9 +349,11 @@ class RosettaSourceParser:
             return (
                 "Male"
                 if self.source["gender"] == "M"
-                else "Female"
-                if self.source["gender"] == "F"
-                else self.source["gender"]
+                else (
+                    "Female"
+                    if self.source["gender"] == "F"
+                    else self.source["gender"]
+                )
             )
         return None
 
@@ -695,9 +705,11 @@ class RosettaSourceParser:
                     {
                         "name": name,
                         "title": title,
-                        "date": f"{date_from}–{date_to}"
-                        if date_from or date_to
-                        else "",
+                        "date": (
+                            f"{date_from}–{date_to}"
+                            if date_from or date_to
+                            else ""
+                        ),
                     }
                 )
         return creators
@@ -714,9 +726,11 @@ class RosettaSourceParser:
                 acquisition.append(
                     {
                         "title": title,
-                        "date": f"{date_from}–{date_to}"
-                        if date_from or date_to
-                        else None,
+                        "date": (
+                            f"{date_from}–{date_to}"
+                            if date_from or date_to
+                            else None
+                        ),
                     }
                 )
         return acquisition

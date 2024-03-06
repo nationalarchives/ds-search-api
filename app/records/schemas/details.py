@@ -60,6 +60,8 @@ class RecordCreatorPerson(RecordCreator):
     type: str = "person"
     name_parts: dict = {}
     date: str | None = None
+    birth: str | None = None
+    death: str | None = None
     gender: str | None = None
     functions: str | None = None
     biography: str | None = None
