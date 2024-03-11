@@ -27,6 +27,8 @@ class Record(Details):
     administrative_background: str | None = None
     arrangement: str | None = None
     date: str | None = None
+    date_from: str | None = None
+    date_to: str | None = None
     is_digitised: bool | None = None
     held_by: dict = {}
     creators: list[dict] = []

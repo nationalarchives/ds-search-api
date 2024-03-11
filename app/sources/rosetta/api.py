@@ -153,7 +153,7 @@ class RosettaRecordDetails(RosettaRecords):
         try:
             parsed_data = RosettaResponseParser(raw_results)
         except Exception:
-            raise Exception("Respone is not recognised")
+            raise Exception("Response is not recognised")
         if (
             parsed_data.type() == "record"
             or parsed_data.type() == "aggregation"
@@ -170,7 +170,9 @@ class RosettaRecordDetails(RosettaRecords):
                 parsed_data.administrative_background()
             )
             record.arrangement = parsed_data.arrangement()
-            record.date = parsed_data.date_range()
+            record.date = parsed_data.date()
+            record.date_from = parsed_data.date_from()
+            record.date_to = parsed_data.date_to()
             record.is_digitised = parsed_data.is_digitised()
             record.held_by = parsed_data.held_by()
             record.creators = parsed_data.creators()
@@ -190,6 +192,7 @@ class RosettaRecordDetails(RosettaRecords):
                 else []
             )
             record.source_url = source_url
+            print(record.toJSON())
             return record.toJSON()
         if (
             parsed_data.type() == "archive"
