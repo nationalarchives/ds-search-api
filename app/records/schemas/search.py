@@ -5,7 +5,8 @@ from pydantic import ConfigDict
 class RecordSearchResult(APISearchResult):
     type: str = ""
     ref: str | None = None
-    date: str | None = None
+    date_from: str | None = None
+    date_to: str | None = None
     held_by: dict | None = None
 
     def __str__(self):

@@ -88,7 +88,8 @@ class RosettaRecordsSearch(RosettaRecords):
             record.ref = parsed_data.reference_number()
             record.title = parsed_data.title()
             record.description = parsed_data.description()
-            record.date = parsed_data.date()
+            record.date_from = parsed_data.date_from()
+            record.date_to = parsed_data.date_to()
             record.held_by = parsed_data.held_by()
             # if highlight and "highLight" in r:
             #     if "@template.details.summaryTitle" in r["highLight"]:
@@ -123,9 +124,9 @@ class RosettaRecordsSearchStats(RosettaRecords):
         for group in stats:
             self.add_parameter("filter", f"group:({group})")
             url = self.build_url()
-            print(url)
+            # print(url)
             raw_results = self.execute(url)
-            print(url)
+            # print(url)
             results_count = objects.get(raw_results, "stats.total")
             stats[group] = results_count
         return stats
