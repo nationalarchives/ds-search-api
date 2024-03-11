@@ -26,7 +26,6 @@ class Record(Details):
     physical_description: str | None = None
     administrative_background: str | None = None
     arrangement: str | None = None
-    date: str | None = None
     date_from: str | None = None
     date_to: str | None = None
     is_digitised: bool | None = None
@@ -49,7 +48,8 @@ class Record(Details):
 class RecordCreator(Details):
     type: str = "creator"
     name: str | None = None
-    date: str | None = None
+    date_from: str | None = None
+    date_to: str | None = None
     places: list[str] = []
     identifier: str | None = None
     history: str | None = None

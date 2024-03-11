@@ -170,7 +170,6 @@ class RosettaRecordDetails(RosettaRecords):
                 parsed_data.administrative_background()
             )
             record.arrangement = parsed_data.arrangement()
-            record.date = parsed_data.date()
             record.date_from = parsed_data.date_from()
             record.date_to = parsed_data.date_to()
             record.is_digitised = parsed_data.is_digitised()
@@ -192,7 +191,6 @@ class RosettaRecordDetails(RosettaRecords):
                 else []
             )
             record.source_url = source_url
-            print(record.toJSON())
             return record.toJSON()
         if (
             parsed_data.type() == "archive"
@@ -233,7 +231,8 @@ class RosettaRecordDetails(RosettaRecords):
                 return record.toJSON()
             record = RecordCreator(parsed_data.id())
             record.name = parsed_data.title()
-            record.date = parsed_data.date()
+            record.date_from = parsed_data.date_from()
+            record.date_to = parsed_data.date_to()
             record.places = parsed_data.places()
             record.identifier = parsed_data.identifier()
             record.history = parsed_data.functions()
