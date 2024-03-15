@@ -59,7 +59,12 @@ class RosettaSourceParser:
         return objects.get(self.source, "@datatype.actual") or ""
 
     def id(self) -> str:
-        return objects.get(self.source, "@admin.id") or ""
+        return (
+            objects.get(self.source, "@admin.id")
+            or self.iaid
+            or self.faid
+            or ""
+        )
 
     def iaid(self) -> str | None:
         if "identifier" in self.source:
@@ -69,6 +74,20 @@ class RosettaSourceParser:
                     for item in self.source["identifier"]
                     if "type" in item
                     and item["type"] == "iaid"
+                    and "value" in item
+                ),
+                None,
+            )
+        return None
+
+    def faid(self) -> str | None:
+        if "identifier" in self.source:
+            return next(
+                (
+                    item["value"]
+                    for item in self.source["identifier"]
+                    if "type" in item
+                    and item["type"] == "faid"
                     and "value" in item
                 ),
                 None,
@@ -552,15 +571,15 @@ class RosettaSourceParser:
 
     def identifier(self) -> str | None:
         if "identifier" in self.source:
-            if identifier := next(
-                (
-                    item["value"]
-                    for item in self.source["identifier"]
-                    if "primary" in item and item["primary"] and "value" in item
-                ),
-                None,
-            ):
-                return identifier
+            # if identifier := next(
+            #     (
+            #         item["value"]
+            #         for item in self.source["identifier"]
+            #         if "primary" in item and item["primary"] and "value" in item
+            #     ),
+            #     None,
+            # ):
+            #     return identifier
             primary_identifier = next(
                 (
                     item["value"]
@@ -571,7 +590,18 @@ class RosettaSourceParser:
                 ),
                 None,
             )
-            former_identifier = next(
+            return primary_identifier
+            # former_identifier = self.former_identifier()
+            # return (
+            #     f"{primary_identifier} (Former ISAAR ref: {former_identifier})"
+            #     if former_identifier
+            #     else primary_identifier
+            # )
+        return None
+
+    def former_identifier(self) -> str | None:
+        if "identifier" in self.source:
+            return next(
                 (
                     item["value"]
                     for item in self.source["identifier"]
@@ -580,17 +610,7 @@ class RosettaSourceParser:
                     and "value" in item
                 ),
                 None,
-            )
-            return (
-                f"{primary_identifier} (Former ISAAR ref: {former_identifier})"
-                if former_identifier
-                else primary_identifier
-            )
-        return None
-
-    def former_identifier(self) -> str | None:
-        if "identifier" in self.source:
-            return next(
+            ) or next(
                 (
                     item["value"]
                     for item in self.source["identifier"]

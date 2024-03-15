@@ -17,9 +17,8 @@ class Details(BaseModel):
 
 class Record(Details):
     type: str = "record"
-    ref: str | None = None
-    iaid: str | None = None
-    former_ref: str | None = None
+    identifier: str | None = None
+    former_identifier: str | None = None
     title: str | None = None
     summary_title: str | None = None
     description: str | None = None
@@ -48,6 +47,8 @@ class Record(Details):
 class RecordCreator(Details):
     type: str = "creator"
     name: str | None = None
+    identifier: str | None = None
+    former_identifier: str | None = None
     date_from: str | None = None
     date_to: str | None = None
     places: list[str] = []
@@ -61,6 +62,8 @@ class RecordCreator(Details):
 class RecordCreatorPerson(RecordCreator):
     type: str = "person"
     name_parts: dict = {}
+    identifier: str | None = None
+    former_identifier: str | None = None
     date: str | None = None
     birth: str | None = None
     death: str | None = None
