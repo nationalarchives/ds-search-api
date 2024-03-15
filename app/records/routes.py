@@ -1,10 +1,6 @@
 from app.records import router
 from app.schemas import Filter
-from app.sources.rosetta import (
-    RosettaRecordDetails,
-    RosettaRecordsSearch,
-    RosettaRecordsSearchStats,
-)
+from app.sources.rosetta import RosettaRecordDetails, RosettaRecordsSearch
 from fastapi import HTTPException
 
 from .schemas import Record, RecordArchive, RecordCreator, RecordSearchResults

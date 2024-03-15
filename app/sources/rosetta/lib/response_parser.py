@@ -28,19 +28,18 @@ non_tna_hierarchy_level_names = {
 
 class RosettaResponseParser:
     def __new__(cls, rosetta_data: dict, source_item: int = 0):
-        rosetta_data_source = objects.get(
-            rosetta_data, f"metadata.{source_item}._source"
-        )
+        rosetta_metadata = objects.get(rosetta_data, f"metadata.{source_item}")
         if not rosetta_data_source:
             raise Exception("Invalid response structure")
-        return RosettaSourceParser(rosetta_data_source)
+        return RosettaSourceParser(rosetta_metadata)
 
 
 class RosettaSourceParser:
     # Current mapping: https://github.com/nationalarchives/ds-infrastructure-ciim/blob/main/kubernetes/rosetta-staging/config/jpt.json
 
-    def __init__(self, rosetta_data_source):
-        self.source = rosetta_data_source
+    def __init__(self, rosetta_metadata):
+        self.source = objects.get(rosetta_metadata, "_source")
+        self.highlight = objects.get(rosetta_metadata, "highLight")
 
     def strip_scope_and_content(self, markup):
         document = PyQuery(markup.replace("<p/>", ""))
@@ -110,7 +109,10 @@ class RosettaSourceParser:
             return "tna" in groups or "nonTna" not in groups
         return self.is_digitised() or False
 
-    def title(self) -> str:
+    def title(self, highlight=False) -> str:
+        if highlight and self.highlight:
+            if "@template.details.summaryTitle" in self.highlight:
+                return self.highlight["@template.details.summaryTitle"][0]
         if "title" in self.source:
             if display_title := next(
                 (
@@ -141,7 +143,10 @@ class RosettaSourceParser:
             return description
         return ""
 
-    def summary_title(self) -> str | None:
+    def summary_title(self, highlight=False) -> str | None:
+        if highlight and self.highlight:
+            if "@template.details.summaryTitle" in self.highlight:
+                return self.highlight["@template.details.summaryTitle"][0]
         return objects.get(self.source, "summary.title")
 
     def name(self) -> str | None:
@@ -439,7 +444,10 @@ class RosettaSourceParser:
                 }
         return {}
 
-    def description(self) -> str | None:
+    def description(self, highlight=False) -> str | None:
+        if highlight and self.highlight:
+            if "@template.details.description" in self.highlight:
+                return self.highlight["@template.details.description"][0]
         if "description" in self.source:
             if description := next(
                 (

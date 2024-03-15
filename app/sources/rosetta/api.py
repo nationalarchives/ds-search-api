@@ -59,8 +59,9 @@ class RosettaRecordsSearch(RosettaRecords):
         self.add_parameter("size", self.results_per_page)
         self.add_parameter("from", offset)
         url = self.build_url()
+        print(url)
         raw_results = self.execute(url)
-        results = self.parse_results(raw_results, page, url)
+        results = self.parse_results(raw_results, page, url, highlight)
         # TODO: Can we get aggregated stats?
         # stats_api = RosettaRecordsSearchStats(self.params["q"])
         # results_stats = stats_api.get_result()
@@ -69,12 +70,16 @@ class RosettaRecordsSearch(RosettaRecords):
         return results.toJSON() if results.page_in_range() else {}
 
     def parse_results(
-        self, raw_results, page, source_url
+        self,
+        raw_results: dict,
+        page: int,
+        source_url: str,
+        highlight: bool | None = False,
     ) -> RecordSearchResults:
         response = RecordSearchResults()
         response.source_url = source_url
         for r in raw_results["metadata"]:
-            parsed_data = RosettaSourceParser(r["_source"])
+            parsed_data = RosettaSourceParser(r)
             record = RecordSearchResult()
             type = parsed_data.type()
             if type == "repository":
@@ -86,16 +91,11 @@ class RosettaRecordsSearch(RosettaRecords):
             record.type = type
             record.id = parsed_data.id()
             record.ref = parsed_data.reference_number()
-            record.title = parsed_data.title()
-            record.description = parsed_data.description()
+            record.title = parsed_data.title(highlight)
+            record.description = parsed_data.description(highlight)
             record.date_from = parsed_data.date_from()
             record.date_to = parsed_data.date_to()
             record.held_by = parsed_data.held_by()
-            # if highlight and "highLight" in r:
-            #     if "@template.details.summaryTitle" in r["highLight"]:
-            #         record.title = r["highLight"]["@template.details.summaryTitle"][0]
-            #     if "@template.details.description" in r["highLight"]:
-            #         record.title = r["highLight"]["@template.details.description"][0]
             response.results.append(record)
         response.count = (
             raw_results["stats"]["total"]
@@ -107,29 +107,29 @@ class RosettaRecordsSearch(RosettaRecords):
         return response
 
 
-class RosettaRecordsSearchStats(RosettaRecords):
-    def __init__(self, query_string):
-        super().__init__()
-        self.api_path = "/search"
-        self.add_parameter("q", query_string)
+# class RosettaRecordsSearchStats(RosettaRecords):
+#     def __init__(self, query_string):
+#         super().__init__()
+#         self.api_path = "/search"
+#         self.add_parameter("q", query_string)
 
-    def get_result(self) -> dict:
-        stats = {
-            "tna": None,
-            "digitised": None,
-            "nonTna": None,
-            "creator": None,
-            "archive": None,
-        }
-        for group in stats:
-            self.add_parameter("filter", f"group:({group})")
-            url = self.build_url()
-            # print(url)
-            raw_results = self.execute(url)
-            # print(url)
-            results_count = objects.get(raw_results, "stats.total")
-            stats[group] = results_count
-        return stats
+#     def get_result(self) -> dict:
+#         stats = {
+#             "tna": None,
+#             "digitised": None,
+#             "nonTna": None,
+#             "creator": None,
+#             "archive": None,
+#         }
+#         for group in stats:
+#             self.add_parameter("filter", f"group:({group})")
+#             url = self.build_url()
+#             # print(url)
+#             raw_results = self.execute(url)
+#             # print(url)
+#             results_count = objects.get(raw_results, "stats.total")
+#             stats[group] = results_count
+#         return stats
 
 
 class RosettaRecordsSearchAll(RosettaRecords):
