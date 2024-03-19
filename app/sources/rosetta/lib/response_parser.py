@@ -29,7 +29,7 @@ non_tna_hierarchy_level_names = {
 class RosettaResponseParser:
     def __new__(cls, rosetta_data: dict, source_item: int = 0):
         rosetta_metadata = objects.get(rosetta_data, f"metadata.{source_item}")
-        if not rosetta_data_source:
+        if not rosetta_metadata:
             raise Exception("Invalid response structure")
         return RosettaSourceParser(rosetta_metadata)
 
