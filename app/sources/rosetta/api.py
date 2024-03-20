@@ -147,6 +147,7 @@ class RosettaRecordDetails(RosettaRecords):
         self.add_parameter("id", id)
         self.add_parameter("includeSource", True)
         url = self.build_url()
+        print(url)
         raw_results = self.execute(url)
         return self.parse_results(raw_results, url)
 

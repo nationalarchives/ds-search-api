@@ -47,7 +47,7 @@ class RosettaSourceParser:
 
     def strip_wrapper_and_split_span(self, markup):
         document = PyQuery(markup)
-        spans = document("span.wrapper").find("span.emph")
+        spans = document("span.wrapper").find("span")
         contents = [span.text for span in spans if span.text is not None]
         return "<br>".join(contents)
 
