@@ -9,7 +9,7 @@ from app.records.schemas import (
 )
 from app.schemas import Filter
 from config import Config
-from pydash import objects
+# from pydash import objects
 
 from .lib import RosettaResponseParser, RosettaSourceParser
 
