@@ -1,4 +1,6 @@
-FROM ghcr.io/nationalarchives/tna-python:latest
+ARG IMAGE_TAG=latest
+
+FROM ghcr.io/nationalarchives/tna-python:"$IMAGE_TAG"
 
 # Copy in the application code
 COPY --chown=app . .
