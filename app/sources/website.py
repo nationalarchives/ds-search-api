@@ -80,7 +80,7 @@ class WebsiteArticles(WagtailAPI):
             page_details_url = f"{self.api_base_url}{self.api_path}{article.id}"
             page_details = page_details_api.execute(page_details_url)
             article.description = page_details["meta"]["search_description"]
-            article.image = page_details["teaser_image_jpg"]
+            article.image = page_details["teaser_image"]["image_jpeg"]
             response.results.append(article)
         response.count = raw_results["meta"]["total_count"]
         response.results_per_page = self.results_per_page
