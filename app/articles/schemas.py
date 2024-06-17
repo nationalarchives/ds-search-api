@@ -4,8 +4,8 @@ from pydantic import ConfigDict
 
 class Article(APISearchResult):
     url: str = ""
-    type: str = ""
-    first_published: str = ""
+    type_label: str = ""
+    # first_published: str = ""
     image: dict | None = None
 
     def __str__(self):
