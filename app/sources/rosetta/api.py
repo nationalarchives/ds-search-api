@@ -8,7 +8,8 @@ from app.records.schemas import (
     RecordSearchResults,
 )
 from app.schemas import Filter
-from config import Config
+
+from app import get_config
 
 from .lib import RosettaResponseParser, RosettaSourceParser
 
@@ -16,7 +17,7 @@ from .lib import RosettaResponseParser, RosettaSourceParser
 
 
 class RosettaRecords(GetAPI):
-    api_base_url = Config().ROSETTA_API_URL
+    api_base_url = get_config().ROSETTA_API_URL
 
 
 class RosettaRecordsSearch(RosettaRecords):

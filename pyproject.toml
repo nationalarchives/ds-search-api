@@ -15,6 +15,7 @@ requests = "^2.31.0"
 fastapi = "^0.110.0"
 pyquery = "^2.0.0"
 pydash = "^7.0.6"
+sentry-sdk = {extras = ["fastapi"], version = "^2.5.1"}
 
 [build-system]
 requires = ["poetry-core"]

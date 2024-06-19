@@ -3,11 +3,12 @@ import math
 from app.articles.schemas import Article, ArticleSearchResults
 from app.lib.api import GetAPI
 from app.schemas import Filter
-from config import Config
+
+from app import get_config
 
 
 class WagtailAPI(GetAPI):
-    api_base_url = Config().WAGTAIL_API_URL
+    api_base_url = get_config().WAGTAIL_API_URL
 
     def __init__(self):
         self.api_base_url
