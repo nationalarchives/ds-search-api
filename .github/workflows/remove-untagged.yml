@@ -31,3 +31,4 @@ jobs:
         uses: nationalarchives/ds-docker-actions/.github/actions/remove-untagged@main
         with:
           docker-image-name: ${{ vars.DOCKER_IMAGE_NAME }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
