@@ -40,6 +40,6 @@ jobs:
         uses: nationalarchives/ds-docker-actions/.github/actions/docker-build@main
         with:
           version: ${{ steps.version-tag.outputs.version-tag }}
-          latest: ${{ github.ref == 'refs/heads/main' }}
+          latest: ${{ github.ref == 'refs/heads/proof-of-concept' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           docker-image-name: ${{ vars.DOCKER_IMAGE_NAME }}
