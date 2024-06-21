@@ -8,24 +8,6 @@ concurrency:
   group: cd-${{ github.ref }}
 
 jobs:
-  # build-old:
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     packages: write
-  #     contents: read
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Get tag
-  #       id: version-tag
-  #       uses: ./.github/actions/get-version-tag
-  #     - name: Build Docker image
-  #       uses: ./.github/actions/docker-build
-  #       with:
-  #         version: ${{ steps.version-tag.outputs.version-tag }}
-  #         latest: true
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         docker-image-name: ${{ vars.DOCKER_IMAGE_NAME }}
-
   build:
     runs-on: ubuntu-latest
     permissions:
