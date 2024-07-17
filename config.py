@@ -6,14 +6,11 @@ from app.lib.util import strtobool
 class Base(object):
     ENVIRONMENT = os.environ.get("ENVIRONMENT", "production")
 
-    SECRET_KEY = os.environ.get("SECRET_KEY")
-
     DEBUG = strtobool(os.getenv("DEBUG", "False"))
     LOG_LEVEL = os.getenv("LOG_LEVEL", "info")
 
     SENTRY_DSN = os.getenv("SENTRY_DSN", "")
     SENTRY_SAMPLE_RATE = float(os.getenv("SENTRY_SAMPLE_RATE", "1.0"))
-    SENTRY_JS = os.getenv("SENTRY_JS", "")
 
     ROSETTA_API_URL = os.environ.get("ROSETTA_API_URL").rstrip("/")
     WAGTAIL_API_URL = os.environ.get("WAGTAIL_API_URL").rstrip("/")
