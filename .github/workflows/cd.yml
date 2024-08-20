@@ -58,7 +58,7 @@ jobs:
       - name: Push new version
         run: |
           git add config/develop.json
-          git commit -m "Update search API to v${{ needs.version.outputs.version }}"
+          git commit -m "Update search-api to v${{ needs.version.outputs.version }}"
           git push origin main
 
   update-dblclk:
