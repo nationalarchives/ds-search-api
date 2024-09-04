@@ -11,7 +11,7 @@ services:
       - ROSETTA_API_URL=http://afa13a7c0067b4f01991b0bad9e003a4-edf0e30af2b95f5f.elb.eu-west-2.amazonaws.com/api/v1
       - WAGTAIL_API_URL=http://host.docker.internal:8000/api/v2
     ports:
-      - 65534:8080
+      - 65531:8080
     volumes:
       - ./:/app
 
