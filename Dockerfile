@@ -12,4 +12,4 @@ RUN tna-build
 COPY --chown=app . .
 
 # Run the application
-CMD ["tna-run", "-a", "etna-search-api:app"]
+CMD ["tna-run", "-a", "ds_search_api:app"]
